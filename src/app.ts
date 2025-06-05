@@ -11,7 +11,7 @@ const app = express();
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(express.json());
-app.use("/api", userRoutes);
+app.use("/api/user", userRoutes);
 app.use(errorHandler);
 
 export default app;

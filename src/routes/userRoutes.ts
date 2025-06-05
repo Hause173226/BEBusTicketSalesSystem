@@ -32,7 +32,7 @@ const router = express.Router();
  *       500:
  *         description: Lỗi server
  */
-router.post("/users", createUser);
+router.post("/", createUser);
 /**
  * @swagger
  * /api/users:
@@ -45,7 +45,7 @@ router.post("/users", createUser);
  *       500:
  *         description: Lỗi server
  */
-router.get("/users", getAllUsers);
+router.get("/", getAllUsers);
 /**
  * @swagger
  * /api/users/{id}:
@@ -67,6 +67,6 @@ router.get("/users", getAllUsers);
  *       500:
  *         description: Lỗi server
  */
-router.delete("/users/:id", deleteUser);
+router.delete("/:id", deleteUser);
 
 export default router;
