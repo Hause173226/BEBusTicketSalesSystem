@@ -3,6 +3,7 @@ import { ITicket } from "../interfaces/ITicket";
 
 const ticketSchema = new Schema<ITicket>(
   {
+    
     ticketNumber: { type: String, required: true },
     departureTime: { type: Date, required: true },
     arrivalTime: { type: Date, required: true },
