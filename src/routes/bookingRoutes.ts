@@ -1,7 +1,8 @@
 import express from "express";
 import { bookingController } from "../controllers/bookingController";
+import { authenticateJWT } from "../middlewares/authenticate";
 
-const router = express.Router();
+const bookingRoutes = express.Router();
 
 /**
  * @swagger
@@ -45,7 +46,7 @@ const router = express.Router();
  *       500:
  *         description: Lỗi server
  */
-router.post("/", bookingController.createBooking);
+bookingRoutes.post("/", authenticateJWT, bookingController.createBooking);
 
 /**
  * @swagger
@@ -85,7 +86,7 @@ router.post("/", bookingController.createBooking);
  *       500:
  *         description: Lỗi server
  */
-router.get("/", bookingController.getAllBookings);
+bookingRoutes.get("/", authenticateJWT, bookingController.getAllBookings);
 
 /**
  * @swagger
@@ -108,7 +109,7 @@ router.get("/", bookingController.getAllBookings);
  *       500:
  *         description: Lỗi server
  */
-router.get("/:id", bookingController.getBookingById);
+bookingRoutes.get("/:id", authenticateJWT, bookingController.getBookingById);
 
 /**
  * @swagger
@@ -148,7 +149,7 @@ router.get("/:id", bookingController.getBookingById);
  *       500:
  *         description: Lỗi server
  */
-router.put("/:id", bookingController.updateBooking);
+bookingRoutes.put("/:id", authenticateJWT, bookingController.updateBooking);
 
 /**
  * @swagger
@@ -171,7 +172,7 @@ router.put("/:id", bookingController.updateBooking);
  *       500:
  *         description: Lỗi server
  */
-router.delete("/:id", bookingController.deleteBooking);
+bookingRoutes.delete("/:id", authenticateJWT, bookingController.deleteBooking);
 
 /**
  * @swagger
@@ -194,7 +195,7 @@ router.delete("/:id", bookingController.deleteBooking);
  *       500:
  *         description: Lỗi server
  */
-router.get("/customer/:customerId", bookingController.getBookingsByCustomer);
+bookingRoutes.get("/customer/:customerId", authenticateJWT, bookingController.getBookingsByCustomer);
 
 /**
  * @swagger
@@ -227,7 +228,7 @@ router.get("/customer/:customerId", bookingController.getBookingsByCustomer);
  *       500:
  *         description: Lỗi server
  */
-router.patch("/:id/status", bookingController.updateBookingStatus);
+bookingRoutes.patch("/:id/status", authenticateJWT, bookingController.updateBookingStatus);
 
 /**
  * @swagger
@@ -260,6 +261,6 @@ router.patch("/:id/status", bookingController.updateBookingStatus);
  *       500:
  *         description: Lỗi server
  */
-router.patch("/:id/payment", bookingController.updatePaymentStatus);
+bookingRoutes.patch("/:id/payment", authenticateJWT, bookingController.updatePaymentStatus);
 
-export default router;
+export default bookingRoutes;

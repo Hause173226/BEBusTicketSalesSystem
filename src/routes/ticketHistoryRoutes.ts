@@ -1,15 +1,16 @@
+import { TicketHistory } from './../models/TicketHistory';
 import express from 'express';
 import {
     getTicketHistory,
     getAllHistory
 } from '../controllers/ticketHistoryController';
 
-const router = express.Router();
+const ticketHistoryRoutes = express.Router();
 
 // Get history for a specific ticket
-router.get('/ticket/:ticketId', getTicketHistory);
+ticketHistoryRoutes.get('/ticket/:ticketId', getTicketHistory);
 
 // Get all ticket history
-router.get('/', getAllHistory);
+ticketHistoryRoutes.get('/', getAllHistory);
 
-export default router; 
+export default ticketHistoryRoutes; 
