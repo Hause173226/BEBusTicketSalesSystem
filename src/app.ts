@@ -7,6 +7,7 @@ import { swaggerSpec } from "./swagger";
 import ticketRoutes from "./routes/ticketRoutes";
 import ticketHistoryRoutes from "./routes/ticketHistoryRoutes";
 import cors from "cors";
+import tripRoutes from "./routes/tripRoutes";
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ app.use(
 
 app.use(express.json());
 app.use("/api/user", userRoutes);
+app.use("/api/trip", tripRoutes);
 app.use("/api/ticket", ticketRoutes);
 app.use("/api/ticket-history", ticketHistoryRoutes);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
