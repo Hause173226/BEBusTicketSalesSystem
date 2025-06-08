@@ -10,6 +10,7 @@ import cors from "cors";
 import stationRoutes from "./routes/stationRoutes"
 import tripRoutes from "./routes/tripRoutes";
 import bookingRoutes from "./routes/bookingRoutes";
+import routeRoutes from "./routes/routeRoutes";
 dotenv.config();
 
 const app = express();
@@ -28,6 +29,7 @@ app.use(
 app.use(express.json());
 app.use("/api/user", userRoutes);
 app.use("/api/trip", tripRoutes);
+app.use("/api/route", routeRoutes);
 app.use("/api/booking", bookingRoutes);
 app.use("/api/ticket", ticketRoutes);
 app.use("/api/station", stationRoutes);
