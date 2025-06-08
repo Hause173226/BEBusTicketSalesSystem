@@ -3,9 +3,93 @@ import {
   createUser,
   deleteUser,
   getAllUsers,
+  signIn,
+  signOut,
+  signUp,
 } from "../controllers/userController";
+import { authenticateJWT } from "../middlewares/authenticate";
 
-const router = express.Router();
+const userRoutes = express.Router();
+
+/**
+ * @swagger
+ * /api/auth/signup:
+ *   post:
+ *     summary: Đăng ký tài khoản mới
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               fullName:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *             required:
+ *               - fullName
+ *               - phone
+ *               - password
+ *     responses:
+ *       201:
+ *         description: Đăng ký thành công
+ *       400:
+ *         description: Dữ liệu không hợp lệ hoặc đã tồn tại
+ *       500:
+ *         description: Lỗi server
+ */
+userRoutes.post("/signup", signUp);
+
+/**
+ * @swagger
+ * /api/auth/signin:
+ *   post:
+ *     summary: Đăng nhập
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               phone:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *             required:
+ *               - phone
+ *               - password
+ *     responses:
+ *       200:
+ *         description: Đăng nhập thành công
+ *       400:
+ *         description: Số điện thoại hoặc mật khẩu không đúng
+ *       500:
+ *         description: Lỗi server
+ */
+userRoutes.post("/signin", signIn);
+
+/**
+ * @swagger
+ * /api/auth/signout:
+ *   post:
+ *     summary: Đăng xuất
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: Đăng xuất thành công
+ *       500:
+ *         description: Lỗi server
+ */
+userRoutes.post("/signout", signOut);
+
 /**
  * @swagger
  * /api/user:
@@ -44,7 +128,7 @@ const router = express.Router();
  *       500:
  *         description: Lỗi server
  */
-router.post("/", createUser);
+userRoutes.post("/", createUser);
 
 /**
  * @swagger
@@ -82,7 +166,7 @@ router.post("/", createUser);
  *       500:
  *         description: Lỗi server
  */
-router.get("/", getAllUsers);
+userRoutes.get("/", authenticateJWT, getAllUsers);
 /**
  * @swagger
  * /api/user/{id}:
@@ -104,6 +188,6 @@ router.get("/", getAllUsers);
  *       500:
  *         description: Lỗi server
  */
-router.delete("/:id", deleteUser);
+userRoutes.delete("/:id", deleteUser);
 
-export default router;
+export default userRoutes;
