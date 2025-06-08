@@ -3,6 +3,7 @@ export interface IUser {
   phone: string;
   email?: string;
   citizenId?: string;
+  password: string; // Required for authentication
   dateOfBirth?: Date;
   gender?: "male" | "female" | "other";
   address?: string;
