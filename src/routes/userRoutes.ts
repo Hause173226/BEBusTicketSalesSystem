@@ -13,7 +13,7 @@ const userRoutes = express.Router();
 
 /**
  * @swagger
- * /api/auth/signup:
+ * /api/user/signup:
  *   post:
  *     summary: Đăng ký tài khoản mới
  *     tags: [Auth]
@@ -48,7 +48,7 @@ userRoutes.post("/signup", signUp);
 
 /**
  * @swagger
- * /api/auth/signin:
+ * /api/user/signin:
  *   post:
  *     summary: Đăng nhập
  *     tags: [Auth]
@@ -78,7 +78,7 @@ userRoutes.post("/signin", signIn);
 
 /**
  * @swagger
- * /api/auth/signout:
+ * /api/user/signout:
  *   post:
  *     summary: Đăng xuất
  *     tags: [Auth]
