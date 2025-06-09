@@ -11,6 +11,7 @@ import stationRoutes from "./routes/stationRoutes"
 import tripRoutes from "./routes/tripRoutes";
 import bookingRoutes from "./routes/bookingRoutes";
 import routeRoutes from "./routes/routeRoutes";
+import seatRoutes from "./routes/seatRoutes";
 dotenv.config();
 
 const app = express();
@@ -35,6 +36,7 @@ app.use("/api/route", routeRoutes);
 app.use("/api/booking", bookingRoutes);
 app.use("/api/ticket", ticketRoutes);
 app.use("/api/station", stationRoutes);
+app.use("/api/seat",seatRoutes)
 app.use("/api/ticket-history", ticketHistoryRoutes);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
