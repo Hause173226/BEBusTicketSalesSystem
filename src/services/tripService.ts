@@ -12,8 +12,8 @@ export const tripService = {
   getAllTrips: async () => {
 
     const trips = await Trip.find()
-        // .populate('route')  
-        // .populate('bus')
+        .populate('route')  
+        .populate('bus')
       .lean();
 
     return trips;
@@ -22,8 +22,8 @@ export const tripService = {
   // Get a single trip by ID
   getTripById: async (tripId: string) => {
     const trip = await Trip.findById(tripId)
-      // .populate('route')
-      // .populate('bus');
+      .populate('route')
+      .populate('bus');
     if (!trip) {
       throw new Error("Trip not found");
     }
