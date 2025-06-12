@@ -15,7 +15,7 @@ const userRoutes = express.Router();
 
 /**
  * @swagger
- * /api/user/signup:
+ * /api/users/signup:
  *   post:
  *     summary: Đăng ký tài khoản mới
  *     tags: [Auth]
@@ -49,7 +49,7 @@ const userRoutes = express.Router();
 
 /**
  * @swagger
- * /api/user/signin:
+ * /api/users/signin:
  *   post:
  *     summary: Đăng nhập
  *     tags: [Auth]
@@ -78,7 +78,7 @@ const userRoutes = express.Router();
 
 /**
  * @swagger
- * /api/user/forgot-password:
+ * /api/users/forgot-password:
  *   post:
  *     summary: Quên mật khẩu (gửi OTP về email)
  *     tags: [Auth]
@@ -104,7 +104,7 @@ const userRoutes = express.Router();
 
 /**
  * @swagger
- * /api/user/resend-otp:
+ * /api/users/resend-otp:
  *   post:
  *     summary: Gửi lại OTP
  *     tags: [Auth]
@@ -130,7 +130,7 @@ const userRoutes = express.Router();
 
 /**
  * @swagger
- * /api/user/reset-password:
+ * /api/users/reset-password:
  *   post:
  *     summary: Đặt lại mật khẩu bằng OTP
  *     tags: [Auth]
@@ -162,7 +162,7 @@ const userRoutes = express.Router();
 
 /**
  * @swagger
- * /api/user/signout:
+ * /api/users/signout:
  *   post:
  *     summary: Đăng xuất
  *     tags: [Auth]
@@ -175,7 +175,7 @@ const userRoutes = express.Router();
 
 /**
  * @swagger
- * /api/user:
+ * /api/users:
  *   get:
  *     summary: Lấy danh sách tất cả users
  *     tags: [Users]
@@ -212,7 +212,7 @@ const userRoutes = express.Router();
 
 /**
  * @swagger
- * /api/user/{id}:
+ * /api/users/{id}:
  *   delete:
  *     summary: Xóa một user theo ID
  *     tags: [Users]
