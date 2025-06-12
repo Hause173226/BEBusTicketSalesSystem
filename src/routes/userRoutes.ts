@@ -46,7 +46,6 @@ const userRoutes = express.Router();
  *       500:
  *         description: Lỗi server
  */
-userRoutes.post("/signup", signUp);
 
 /**
  * @swagger
@@ -61,26 +60,105 @@ userRoutes.post("/signup", signUp);
  *           schema:
  *             type: object
  *             properties:
- *               phone:
+ *               email:
  *                 type: string
  *               password:
  *                 type: string
  *             required:
- *               - phone
+ *               - email
  *               - password
  *     responses:
  *       200:
  *         description: Đăng nhập thành công
  *       400:
- *         description: Số điện thoại hoặc mật khẩu không đúng
+ *         description: Email hoặc mật khẩu không đúng
  *       500:
  *         description: Lỗi server
  */
-userRoutes.post("/signin", signIn);
 
-userRoutes.post("/forgot-password", forgotPassword);
-userRoutes.post("/resend-otp", resendOTP);
-userRoutes.post("/reset-password", resetPasswordWithOTP);
+/**
+ * @swagger
+ * /api/user/forgot-password:
+ *   post:
+ *     summary: Quên mật khẩu (gửi OTP về email)
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *             required:
+ *               - email
+ *     responses:
+ *       200:
+ *         description: Đã gửi OTP thành công
+ *       400:
+ *         description: Email không tồn tại
+ *       500:
+ *         description: Lỗi server
+ */
+
+/**
+ * @swagger
+ * /api/user/resend-otp:
+ *   post:
+ *     summary: Gửi lại OTP
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *             required:
+ *               - email
+ *     responses:
+ *       200:
+ *         description: Đã gửi lại OTP thành công
+ *       400:
+ *         description: Email không tồn tại
+ *       500:
+ *         description: Lỗi server
+ */
+
+/**
+ * @swagger
+ * /api/user/reset-password:
+ *   post:
+ *     summary: Đặt lại mật khẩu bằng OTP
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               otp:
+ *                 type: string
+ *               newPassword:
+ *                 type: string
+ *             required:
+ *               - email
+ *               - otp
+ *               - newPassword
+ *     responses:
+ *       200:
+ *         description: Đặt lại mật khẩu thành công
+ *       400:
+ *         description: OTP không hợp lệ hoặc hết hạn
+ *       500:
+ *         description: Lỗi server
+ */
 
 /**
  * @swagger
@@ -94,7 +172,6 @@ userRoutes.post("/reset-password", resetPasswordWithOTP);
  *       500:
  *         description: Lỗi server
  */
-userRoutes.post("/signout", signOut);
 
 /**
  * @swagger
@@ -132,7 +209,7 @@ userRoutes.post("/signout", signOut);
  *       500:
  *         description: Lỗi server
  */
-userRoutes.get("/", authenticateJWT, getAllUsers);
+
 /**
  * @swagger
  * /api/user/{id}:
@@ -154,6 +231,13 @@ userRoutes.get("/", authenticateJWT, getAllUsers);
  *       500:
  *         description: Lỗi server
  */
+userRoutes.post("/signup", signUp);
+userRoutes.post("/signin", signIn);
+userRoutes.post("/forgot-password", forgotPassword);
+userRoutes.post("/resend-otp", resendOTP);
+userRoutes.post("/reset-password", resetPasswordWithOTP);
+userRoutes.post("/signout", signOut);
+userRoutes.get("/", authenticateJWT, getAllUsers);
 userRoutes.delete("/:id", deleteUser);
 
 export default userRoutes;
