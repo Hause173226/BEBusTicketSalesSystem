@@ -1,3 +1,4 @@
+import { Ticket } from './../models/Ticket';
 import express from 'express';
 import {
     createTicket,
@@ -7,21 +8,21 @@ import {
     updateTicket
 } from '../controllers/ticketController';
 
-const router = express.Router();
+const ticketRoutes = express.Router();
 
 // Create a new ticket
-router.post('/', createTicket );
+ticketRoutes.post('/', createTicket );
 
 // Get all tickets
-router.get('/', getAllTickets );
+ticketRoutes.get('/', getAllTickets );
 
 // Get ticket by ID
-router.get('/:id', getTicketById );
+ticketRoutes.get('/:id', getTicketById );
 
 // Update ticket
-router.put('/:id', updateTicket );
+ticketRoutes.put('/:id', updateTicket );
 
 // Delete ticket
-router.delete('/:id', deleteTicket );
+ticketRoutes.delete('/:id', deleteTicket );
 
-export default router;
+export default ticketRoutes;
