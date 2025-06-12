@@ -195,7 +195,11 @@ bookingRoutes.delete("/:id", authenticateJWT, bookingController.deleteBooking);
  *       500:
  *         description: Lỗi server
  */
-bookingRoutes.get("/customer/:customerId", authenticateJWT, bookingController.getBookingsByCustomer);
+bookingRoutes.get(
+  "/customer/:customerId",
+  authenticateJWT,
+  bookingController.getBookingsByCustomer
+);
 
 /**
  * @swagger
@@ -228,7 +232,11 @@ bookingRoutes.get("/customer/:customerId", authenticateJWT, bookingController.ge
  *       500:
  *         description: Lỗi server
  */
-bookingRoutes.patch("/:id/status", authenticateJWT, bookingController.updateBookingStatus);
+bookingRoutes.patch(
+  "/:id/status",
+  authenticateJWT,
+  bookingController.updateBookingStatus
+);
 
 /**
  * @swagger
@@ -261,6 +269,10 @@ bookingRoutes.patch("/:id/status", authenticateJWT, bookingController.updateBook
  *       500:
  *         description: Lỗi server
  */
-bookingRoutes.patch("/:id/payment", authenticateJWT, bookingController.updatePaymentStatus);
+bookingRoutes.patch(
+  "/:id/payment",
+  authenticateJWT,
+  bookingController.updatePaymentStatus
+);
 
 export default bookingRoutes;

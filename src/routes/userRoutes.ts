@@ -1,9 +1,11 @@
 import express from "express";
 import {
-  createUser,
   deleteUser,
   getAllUsers,
   signIn,
+  forgotPassword,
+  resendOTP,
+  resetPasswordWithOTP,
   signOut,
   signUp,
 } from "../controllers/userController";
@@ -76,6 +78,10 @@ userRoutes.post("/signup", signUp);
  */
 userRoutes.post("/signin", signIn);
 
+userRoutes.post("/forgot-password", forgotPassword);
+userRoutes.post("/resend-otp", resendOTP);
+userRoutes.post("/reset-password", resetPasswordWithOTP);
+
 /**
  * @swagger
  * /api/user/signout:
@@ -89,46 +95,6 @@ userRoutes.post("/signin", signIn);
  *         description: Lỗi server
  */
 userRoutes.post("/signout", signOut);
-
-/**
- * @swagger
- * /api/user:
- *   post:
- *     summary: Tạo mới một user
- *     tags: [Users]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               fullName:
- *                 type: string
- *               phone:
- *                 type: string
- *               email:
- *                 type: string
- *               citizenId:
- *                 type: string
- *               dateOfBirth:
- *                 type: string
- *                 format: date
- *               gender:
- *                 type: string
- *                 enum: [male, female, other]
- *               address:
- *                 type: string
- *             required:
- *               - fullName
- *               - phone
- *     responses:
- *       201:
- *         description: User được tạo thành công
- *       500:
- *         description: Lỗi server
- */
-userRoutes.post("/", createUser);
 
 /**
  * @swagger

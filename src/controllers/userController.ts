@@ -16,12 +16,12 @@ export const signUp = async (req: Request, res: Response) => {
 
 export const signIn = async (req: Request, res: Response) => {
   try {
-    const { phone, password } = req.body;
-    if (!phone || !password) {
-      res.status(400).json({ error: "Thiếu số điện thoại hoặc mật khẩu" });
+    const { email, password, role } = req.body;
+    if (!email || !password) {
+      res.status(400).json({ error: "Thiếu email hoặc mật khẩu" });
       return;
     }
-    const result = await userService.signIn(phone, password);
+    const result = await userService.signIn(email, password, role);
     res.json(result);
   } catch (err) {
     if (err instanceof Error) {
@@ -32,33 +32,63 @@ export const signIn = async (req: Request, res: Response) => {
   }
 };
 
+export const forgotPassword = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      res.status(400).json({ error: "Vui lòng nhập email" });
+      return;
+    }
+    const result = await userService.sendForgotPasswordOTP(email);
+    res.json(result);
+  } catch (err) {
+    res
+      .status(400)
+      .json({ error: err instanceof Error ? err.message : "Lỗi server" });
+  }
+};
+
+export const resendOTP = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      res.status(400).json({ error: "Vui lòng nhập email" });
+      return;
+    }
+    const result = await userService.resendForgotPasswordOTP(email);
+    res.json(result);
+  } catch (err) {
+    res
+      .status(400)
+      .json({ error: err instanceof Error ? err.message : "Lỗi server" });
+  }
+};
+
+export const resetPasswordWithOTP = async (req: Request, res: Response) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+    if (!email || !otp || !newPassword) {
+      res.status(400).json({ error: "Thiếu thông tin" });
+      return;
+    }
+    const result = await userService.verifyOTPAndResetPassword(
+      email,
+      otp,
+      newPassword
+    );
+    res.json(result);
+  } catch (err) {
+    res
+      .status(400)
+      .json({ error: err instanceof Error ? err.message : "Lỗi server" });
+  }
+};
+
 export const signOut = async (req: Request, res: Response) => {
   // Nếu dùng cookie để lưu token:
   // res.clearCookie("token");
   res.status(200).json({ message: "Đăng xuất thành công" });
-};
-
-// export const signIn = async (req: Request, res: Response) => {
-//   try {
-//     const { phone, password } = req.body;
-//     const user = await userService.signIn(phone, password);
-//     res.status(200).json(user);
-//   } catch (err) {
-//     if (err instanceof Error) {
-//       res.status(400).json({ error: err.message });
-//     } else {
-//       res.status(500).json({ error: "Internal Server Error" });
-//     }
-//   }
-// };
-
-export const createUser = async (req: Request, res: Response) => {
-  try {
-    const user = await userService.createUser(req.body);
-    res.status(201).json(user);
-  } catch (err) {
-    res.status(500).json({ error: "Internal Server Error" });
-  }
 };
 
 export const getAllUsers = async (req: Request, res: Response) => {
