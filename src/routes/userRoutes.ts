@@ -8,6 +8,7 @@ import {
   resetPasswordWithOTP,
   signOut,
   signUp,
+  getUserById,
 } from "../controllers/userController";
 import { authenticateJWT } from "../middlewares/authenticate";
 
@@ -231,6 +232,52 @@ const userRoutes = express.Router();
  *       500:
  *         description: Lỗi server
  */
+
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   get:
+ *     summary: Lấy thông tin user theo ID
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID của user cần lấy thông tin
+ *     responses:
+ *       200:
+ *         description: Thông tin user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                   type: string
+ *                 fullName:
+ *                   type: string
+ *                 phone:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 citizenId:
+ *                   type: string
+ *                 dateOfBirth:
+ *                   type: string
+ *                   format: date
+ *                 role:
+ *                   type: string
+ *                 gender:
+ *                   type: string
+ *                 address:
+ *                   type: string
+ *       404:
+ *         description: User không tìm thấy
+ *       500:
+ *         description: Lỗi server
+ */
 userRoutes.post("/signup", signUp);
 userRoutes.post("/signin", signIn);
 userRoutes.post("/forgot-password", forgotPassword);
@@ -238,6 +285,7 @@ userRoutes.post("/resend-otp", resendOTP);
 userRoutes.post("/reset-password", resetPasswordWithOTP);
 userRoutes.post("/signout", signOut);
 userRoutes.get("/", authenticateJWT, getAllUsers);
+userRoutes.get("/:id", authenticateJWT, getUserById);
 userRoutes.delete("/:id", deleteUser);
 
 export default userRoutes;

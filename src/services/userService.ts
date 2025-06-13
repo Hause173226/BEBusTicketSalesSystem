@@ -141,6 +141,17 @@ export const userService = {
     return users;
   },
 
+  getUserById: async (userId: string) => {
+    const user = await Customer.findById(userId).lean();
+    if (!user) {
+      throw new Error("User not found");
+    }
+    // Remove password before returning
+    const userObj = user as any;
+    delete userObj.password;
+    return userObj;
+  },
+
   deleteUser: async (userId: string) => {
     const user = await Customer.findByIdAndDelete(userId);
     if (!user) {
