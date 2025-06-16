@@ -6,7 +6,7 @@ import {
   updateRoute,
   deleteRoute,
   getRoutesByLocation,
-  searchRoutes
+  searchRoutes,
 } from "../controllers/routeController";
 
 const routeRoutes = express.Router();
