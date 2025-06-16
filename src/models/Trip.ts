@@ -10,6 +10,7 @@ const tripSchema = new Schema<ITrip>(
     departureTime: { type: String, required: true }, // HH:mm format
     arrivalTime: { type: String }, // HH:mm format
     basePrice: { type: Number, required: true },
+    discountPercentage: { type: Number, default: 0, min: 0, max: 100 },
     status: {
       type: String,
       enum: ["scheduled", "in_progress", "completed", "cancelled"],
@@ -17,6 +18,13 @@ const tripSchema = new Schema<ITrip>(
     },
     availableSeats: { type: Number },
     notes: { type: String },
+    stops: [
+      {
+        station: { type: Schema.Types.ObjectId, ref: "Station", required: true },
+        time: { type: String, required: true }, // HH:mm format
+        type: { type: String, enum: ["pickup", "dropoff"], required: true },
+      },
+    ],
   },
   { timestamps: true }
 );

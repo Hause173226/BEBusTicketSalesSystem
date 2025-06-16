@@ -12,6 +12,7 @@ const customerSchema = new Schema<IUser>(
     role: { type: String, enum: ["user", "admin"], default: "user" },
     gender: { type: String, enum: ["male", "female", "other"] },
     address: { type: String },
+    isActive: { type: Boolean, default: true }, // Add isActive field
     otpCode: { type: String },
     otpExpires: { type: Date },
   },

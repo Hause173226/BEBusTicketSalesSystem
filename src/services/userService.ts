@@ -159,4 +159,57 @@ export const userService = {
     }
     return user;
   },
+
+  updateUser: async (userId: string, updateData: any) => {
+    const user = await Customer.findById(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Prevent password from being updated directly here
+    if (updateData.password) {
+      throw new Error("Use changePassword to update password");
+    }
+
+    // Prevent role or status from being updated directly here
+    if (updateData.isActive !== undefined) {
+      throw new Error("Use changeUserStatus to update status");
+    }
+
+    // Update fields
+    Object.keys(updateData).forEach((key) => {
+      (user as any)[key] = updateData[key];
+    });
+
+    await user.save();
+    const userObj = user.toObject() as any;
+    delete userObj.password;
+    return userObj;
+  },
+
+  changePassword: async (userId: string, newPassword: string) => {
+    const user = await Customer.findById(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+    return { message: "Password updated successfully" };
+  },
+
+  changeUserStatus: async (userId: string, isActive: boolean) => {
+    const user = await Customer.findById(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    user.isActive = isActive;
+    await user.save();
+    const userObj = user.toObject() as any;
+    delete userObj.password;
+    return userObj;
+  },
+
 };

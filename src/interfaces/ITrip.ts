@@ -8,6 +8,7 @@ export interface ITrip {
   departureTime: string; // Stored as "HH:mm"
   arrivalTime?: string; // Stored as "HH:mm"
   basePrice: number;
+  discountPercentage?: number;
   status?: "scheduled" | "in_progress" | "completed" | "cancelled";
   availableSeats?: number;
   notes?: string;
