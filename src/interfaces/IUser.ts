@@ -8,6 +8,7 @@ export interface IUser {
   role?: "user" | "admin";
   gender?: "male" | "female" | "other";
   address?: string;
+  isActive?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
   otpCode?: string;

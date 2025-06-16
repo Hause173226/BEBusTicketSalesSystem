@@ -9,6 +9,9 @@ import {
   signOut,
   signUp,
   getUserById,
+  updateUser,
+  changePassword,
+  changeUserStatus,
 } from "../controllers/userController";
 import { authenticateJWT } from "../middlewares/authenticate";
 
@@ -278,6 +281,124 @@ const userRoutes = express.Router();
  *       500:
  *         description: Lỗi server
  */
+
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   put:
+ *     summary: Cập nhật thông tin user theo ID
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID của user cần cập nhật
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               fullName:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               citizenId:
+ *                 type: string
+ *               dateOfBirth:
+ *                 type: string
+ *                 format: date
+ *               gender:
+ *                 type: string
+ *               address:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User đã được cập nhật thành công
+ *       400:
+ *         description: Dữ liệu không hợp lệ
+ *       404:
+ *         description: User không tìm thấy
+ *       500:
+ *         description: Lỗi server
+ */
+
+/**
+ * @swagger
+ * /api/users/change-password/{id}:
+ *   put:
+ *     summary: Thay đổi mật khẩu của user theo ID
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID của user cần thay đổi mật khẩu
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               newPassword:
+ *                 type: string
+ *             required:
+ *               - newPassword
+ *     responses:
+ *       200:
+ *         description: Mật khẩu đã được thay đổi thành công
+ *       400:
+ *         description: Dữ liệu không hợp lệ
+ *       404:
+ *         description: User không tìm thấy
+ *       500:
+ *         description: Lỗi server
+ */
+
+/**
+ * @swagger
+ * /api/users/change-status/{id}:
+ *   put:
+ *     summary: Thay đổi trạng thái hoạt động của user theo ID
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID của user cần thay đổi trạng thái
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               isActive:
+ *                 type: boolean
+ *             required:
+ *               - isActive
+ *     responses:
+ *       200:
+ *         description: Trạng thái user đã được cập nhật thành công
+ *       400:
+ *         description: Dữ liệu không hợp lệ
+ *       404:
+ *         description: User không tìm thấy
+ *       500:
+ *         description: Lỗi server
+ */
+
+
 userRoutes.post("/signup", signUp);
 userRoutes.post("/signin", signIn);
 userRoutes.post("/forgot-password", forgotPassword);
@@ -287,5 +408,8 @@ userRoutes.post("/signout", signOut);
 userRoutes.get("/", authenticateJWT, getAllUsers);
 userRoutes.get("/:id", authenticateJWT, getUserById);
 userRoutes.delete("/:id", deleteUser);
+userRoutes.put("/:id", authenticateJWT, updateUser);
+userRoutes.put("/change-password/:id", authenticateJWT, changePassword);
+userRoutes.put("/change-status/:id", authenticateJWT, changeUserStatus);
 
 export default userRoutes;

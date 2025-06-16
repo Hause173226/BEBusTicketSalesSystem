@@ -127,3 +127,58 @@ export const getUserById = async (req: Request, res: Response) => {
     }
   }
 };
+
+export const updateUser = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.id;
+    const updatedUser = await userService.updateUser(userId, req.body);
+    res.status(200).json(updatedUser);
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(400).json({ error: err.message });
+    } else {
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  }
+};
+
+export const changePassword = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.id;
+    const { newPassword } = req.body;
+    if (!newPassword) {
+      res.status(400).json({ error: "New password is required" });
+      return;
+    }
+    const result = await userService.changePassword(userId, newPassword);
+    res.status(200).json(result);
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(400).json({ error: err.message });
+    } else {
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  }
+};
+
+export const changeUserStatus = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.id;
+    const { isActive } = req.body;
+    if (typeof isActive === "undefined") {
+      res.status(400).json({ error: "isActive is required" });
+      return;
+    }
+    const updatedUser = await userService.changeUserStatus(userId, isActive);
+    res.status(200).json(updatedUser);
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(400).json({ error: err.message });
+    } else {
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  }
+};
+
+
+

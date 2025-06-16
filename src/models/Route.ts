@@ -5,8 +5,8 @@ const routeSchema = new Schema<IRoute>(
   {
     name: { type: String, required: true },
     code: { type: String, unique: true },
-    originStation: { type: Schema.Types.ObjectId, ref: "Station", required: true },
-    destinationStation: { type: Schema.Types.ObjectId, ref: "Station", required: true },
+    originStation: [{ type: Schema.Types.ObjectId, ref: "Station", required: true }],
+    destinationStation: [{ type: Schema.Types.ObjectId, ref: "Station", required: true }],
     distanceKm: { type: Number },
     estimatedDuration: { type: Number }, // in minutes
     status: { type: String, enum: ["active", "inactive"], default: "active" },
