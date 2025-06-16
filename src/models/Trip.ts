@@ -18,13 +18,6 @@ const tripSchema = new Schema<ITrip>(
     },
     availableSeats: { type: Number },
     notes: { type: String },
-    stops: [
-      {
-        station: { type: Schema.Types.ObjectId, ref: "Station", required: true },
-        time: { type: String, required: true }, // HH:mm format
-        type: { type: String, enum: ["pickup", "dropoff"], required: true },
-      },
-    ],
   },
   { timestamps: true }
 );
