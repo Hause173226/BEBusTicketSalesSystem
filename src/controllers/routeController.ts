@@ -76,13 +76,13 @@ export const searchRoutes = async (req: Request, res: Response) => {
   try {
     const { startLocationId, endLocationId } = req.query;
     if (!startLocationId || !endLocationId) {
-         res.status(400).json({ 
-        error: "Both startLocationId and endLocationId are required"        
+      res.status(400).json({
+        error: "Both startLocationId and endLocationId are required",
       });
-        return;
+      return;
     }
     const routes = await routeService.searchRoutes(
-      startLocationId as string, 
+      startLocationId as string,
       endLocationId as string
     );
     res.status(200).json(routes);

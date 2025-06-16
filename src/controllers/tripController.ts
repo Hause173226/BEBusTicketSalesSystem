@@ -14,7 +14,6 @@ export const getAllTrips = async (req: Request, res: Response) => {
   try {
     const trips = await tripService.getAllTrips();
     res.status(200).json(trips);
-    console.log("All trips retrieved successfully");
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error" });
   }
@@ -59,5 +58,32 @@ export const deleteTrip = async (req: Request, res: Response) => {
     } else {
       res.status(500).json({ error: "Internal Server Error" });
     }
+  }
+};
+
+export const searchTrips = async (req: Request, res: Response) => {
+  try {
+    const { from, to, date, searchBy } = req.query;
+
+    if (!from || !to || !date || !searchBy) {
+      res.status(400).json({ error: "Missing required query parameters" });
+      return;
+    }
+
+    // searchBy phải là "city" hoặc "station"
+    if (searchBy !== "city" && searchBy !== "station") {
+      res.status(400).json({ error: "searchBy must be 'city' or 'station'" });
+      return;
+    }
+
+    const trips = await tripService.searchTrips(
+      from as string,
+      to as string,
+      date as string,
+      searchBy as "city" | "station"
+    );
+    res.status(200).json(trips);
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };

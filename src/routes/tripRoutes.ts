@@ -5,6 +5,7 @@ import {
   getTripById,
   updateTrip,
   deleteTrip,
+  searchTrips,
 } from "../controllers/tripController";
 
 const tripRoutes = express.Router();
@@ -64,7 +65,7 @@ tripRoutes.post("/", createTrip);
 
 /**
  * @swagger
- * /api/trip:
+ * /api/trips:
  *   get:
  *     summary: Lấy danh sách tất cả chuyến xe
  *     tags: [Trips]
@@ -103,6 +104,48 @@ tripRoutes.post("/", createTrip);
  *         description: Lỗi server
  */
 tripRoutes.get("/", getAllTrips);
+
+/**
+ * @swagger
+ * /api/trips/search:
+ *   get:
+ *     summary: Tìm kiếm chuyến xe theo thông tin
+ *     tags: [Trips]
+ *     parameters:
+ *       - in: query
+ *         name: from
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Tên tỉnh/thành phố hoặc tên bến xe xuất phát
+ *       - in: query
+ *         name: to
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Tên tỉnh/thành phố hoặc tên bến xe đến nơi
+ *       - in: query
+ *         name: date
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Ngày khởi hành (định dạng YYYY-MM-DD)
+ *       - in: query
+ *         name: searchBy
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [city, station]
+ *         description: "Tìm kiếm theo 'city' (tỉnh/thành phố) hoặc 'station' (tên bến xe)"
+ *     responses:
+ *       200:
+ *         description: Danh sách chuyến xe tìm được
+ *       400:
+ *         description: Thông tin tìm kiếm không hợp lệ
+ */
+
+tripRoutes.get("/search", searchTrips);
 
 /**
  * @swagger

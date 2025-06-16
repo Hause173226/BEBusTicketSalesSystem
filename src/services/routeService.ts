@@ -11,8 +11,8 @@ export const routeService = {
   // Get all routes
   getAllRoutes: async () => {
     const routes = await Route.find()
-    //   .populate('startLocation')
-    //   .populate('endLocation')
+      .populate("originStation")
+      .populate("destinationStation")
       .lean();
     return routes;
   },
@@ -20,9 +20,8 @@ export const routeService = {
   // Get route by ID
   getRouteById: async (routeId: string) => {
     const route = await Route.findById(routeId)
-    //   .populate('startLocation')
-    //   .populate('endLocation');
-    
+      .populate("originStation")
+      .populate("destinationStation");
     if (!route) {
       throw new Error("Route not found");
     }
@@ -31,11 +30,10 @@ export const routeService = {
 
   // Update route
   updateRoute: async (routeId: string, updateData: Partial<IRoute>) => {
-    const route = await Route.findByIdAndUpdate(
-      routeId,
-      updateData,
-      { new: true, runValidators: true }
-    )
+    const route = await Route.findByIdAndUpdate(routeId, updateData, {
+      new: true,
+      runValidators: true,
+    });
     //   .populate('startLocation')
     //   .populate('endLocation');
 
@@ -57,13 +55,10 @@ export const routeService = {
   // Additional useful methods
   getRoutesByLocation: async (locationId: string) => {
     const routes = await Route.find({
-      $or: [
-        { startLocation: locationId },
-        { endLocation: locationId }
-      ]
+      $or: [{ startLocation: locationId }, { endLocation: locationId }],
     })
-      .populate('startLocation')
-      .populate('endLocation')
+      .populate("startLocation")
+      .populate("endLocation")
       .lean();
     return routes;
   },
@@ -71,11 +66,11 @@ export const routeService = {
   searchRoutes: async (startLocationId: string, endLocationId: string) => {
     const routes = await Route.find({
       startLocation: startLocationId,
-      endLocation: endLocationId
+      endLocation: endLocationId,
     })
-      .populate('startLocation')
-      .populate('endLocation')
+      .populate("startLocation")
+      .populate("endLocation")
       .lean();
     return routes;
-  }
+  },
 };
