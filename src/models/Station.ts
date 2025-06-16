@@ -5,7 +5,7 @@ const stationSchema = new Schema<IStation>(
   {
     name: { type: String, required: true },
     code: { type: String, unique: true },
-    address: { type: String },
+    address: { type: Object },
     status: { type: String, enum: ['active', 'inactive'], default: 'active' },
   },
   { timestamps: { createdAt: true, updatedAt: false } }
