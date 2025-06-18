@@ -20,14 +20,24 @@ import busRoutes from "./routes/busRoutes";
 
 const app = express();
 
-// app.use(cors());
+// app.use(
+//   cors({
+//     origin: [
+//       "http://localhost:5173",
+//       "http://localhost:5174",
+//       "https://sdn-fe.vercel.app",
+//     ], // Thay bằng domain FE thật của bạn
+//     credentials: true,
+//     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+//     allowedHeaders: ["Content-Type", "Authorization"],
+//   })
+// );
+const allowedOrigins =
+  process.env.NODE_ENV === "production" ? ["https://your-frontend.com"] : true;
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "http://localhost:5174",
-      "https://busticketsalessystem.vercel.app",
-    ], // Thay bằng domain FE thật của bạn
+    origin: allowedOrigins,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
