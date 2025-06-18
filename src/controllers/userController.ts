@@ -179,6 +179,3 @@ export const changeUserStatus = async (req: Request, res: Response) => {
     }
   }
 };
-
-
-
