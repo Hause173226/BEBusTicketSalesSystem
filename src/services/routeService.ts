@@ -19,9 +19,9 @@ export const routeService = {
 
   // Get route by ID
   getRouteById: async (routeId: string) => {
-    const route = await Route.findById(routeId)
-      .populate("originStation")
-      .populate("destinationStation");
+    const route = await Route.findById(routeId);
+    // .populate("originStation")
+    // .populate("destinationStation");
     if (!route) {
       throw new Error("Route not found");
     }

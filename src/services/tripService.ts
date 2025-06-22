@@ -10,6 +10,52 @@ export const tripService = {
     return trip;
   },
 
+  createMultipleTrips: async (
+    tripData: Partial<ITrip>,
+    startTime: string,
+    endTime: string,
+    intervalHours: number = 2
+  ) => {
+    const [startHour, startMinute] = startTime.split(":").map(Number);
+    const [endHour, endMinute] = endTime.split(":").map(Number);
+
+    const trips = [];
+    let currentHour = startHour;
+    let currentMinute = startMinute;
+
+    // Tạo các chuyến cho đến khi departureTime vượt quá endTime
+    while (currentHour < endHour) {
+      // departureTime
+      const departureTime = `${currentHour
+        .toString()
+        .padStart(2, "0")}:${currentMinute.toString().padStart(2, "0")}`;
+
+      // Sinh tripCode: TRIP + 4 số random
+      const tripCode = `TRIP${Math.floor(1000 + Math.random() * 9000)}`;
+
+      // arrivalTime = departureTime + intervalHours
+      let arrivalHour = currentHour + intervalHours;
+      let arrivalMinute = currentMinute;
+      if (arrivalHour >= 24) arrivalHour -= 24; // Đảm bảo không vượt quá 24h
+
+      const arrivalTime = `${arrivalHour
+        .toString()
+        .padStart(2, "0")}:${arrivalMinute.toString().padStart(2, "0")}`;
+
+      const newTrip = await Trip.create({
+        ...tripData,
+        departureTime,
+        arrivalTime,
+        tripCode,
+      });
+      trips.push(newTrip);
+
+      currentHour += intervalHours;
+    }
+
+    return trips;
+  },
+
   // Get all trips with optional population of related fields
   getAllTrips: async () => {
     const trips = await Trip.find().populate("route").populate("bus").lean();

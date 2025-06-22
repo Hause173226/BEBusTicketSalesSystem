@@ -80,9 +80,6 @@ bookingRoutes.post("/", authenticateJWT, bookingController.createBooking);
  *                     type: string
  *                   paymentStatus:
  *                     type: string
- *                   bookingDate:
- *                     type: string
- *                     format: date-time
  *       500:
  *         description: Lỗi server
  */

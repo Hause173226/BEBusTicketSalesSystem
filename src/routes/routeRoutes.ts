@@ -24,25 +24,30 @@ const routeRoutes = express.Router();
  *           schema:
  *             type: object
  *             properties:
- *               startLocation:
+ *               name:
  *                 type: string
- *                 description: ID của điểm xuất phát
- *               endLocation:
+ *               code:
  *                 type: string
- *                 description: ID của điểm đến
- *               distance:
+ *               originStation:
+ *                 type: string
+ *                 description: ID của bến đi
+ *               destinationStation:
+ *                 type: string
+ *                 description: ID của bến đến
+ *               distanceKm:
  *                 type: number
  *                 description: Khoảng cách (km)
- *               duration:
+ *               estimatedDuration:
  *                 type: number
  *                 description: Thời gian di chuyển (phút)
- *               description:
+ *               status:
  *                 type: string
+ *                 enum: [active, inactive]
  *             required:
- *               - startLocation
- *               - endLocation
- *               - distance
- *               - duration
+ *               - name
+ *               - code
+ *               - originStation
+ *               - destinationStation
  *     responses:
  *       201:
  *         description: Tuyến đường được tạo thành công
@@ -69,15 +74,23 @@ routeRoutes.post("/", createRoute);
  *                 properties:
  *                   _id:
  *                     type: string
- *                   startLocation:
+ *                   name:
+ *                     type: string
+ *                   code:
+ *                     type: string
+ *                   originStation:
  *                     type: object
- *                   endLocation:
+ *                   destinationStation:
  *                     type: object
- *                   distance:
+ *                   distanceKm:
  *                     type: number
- *                   duration:
+ *                   estimatedDuration:
  *                     type: number
- *                   description:
+ *                   status:
+ *                     type: string
+ *                   createdAt:
+ *                     type: string
+ *                   updatedAt:
  *                     type: string
  *       500:
  *         description: Lỗi server
@@ -100,6 +113,31 @@ routeRoutes.get("/", getAllRoutes);
  *     responses:
  *       200:
  *         description: Thông tin tuyến đường
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                   type: string
+ *                 name:
+ *                   type: string
+ *                 code:
+ *                   type: string
+ *                 originStation:
+ *                   type: object
+ *                 destinationStation:
+ *                   type: object
+ *                 distanceKm:
+ *                   type: number
+ *                 estimatedDuration:
+ *                   type: number
+ *                 status:
+ *                   type: string
+ *                 createdAt:
+ *                   type: string
+ *                 updatedAt:
+ *                   type: string
  *       404:
  *         description: Không tìm thấy tuyến đường
  *       500:
@@ -127,12 +165,21 @@ routeRoutes.get("/:id", getRouteById);
  *           schema:
  *             type: object
  *             properties:
- *               distance:
- *                 type: number
- *               duration:
- *                 type: number
- *               description:
+ *               name:
  *                 type: string
+ *               code:
+ *                 type: string
+ *               originStation:
+ *                 type: string
+ *               destinationStation:
+ *                 type: string
+ *               distanceKm:
+ *                 type: number
+ *               estimatedDuration:
+ *                 type: number
+ *               status:
+ *                 type: string
+ *                 enum: [active, inactive]
  *     responses:
  *       200:
  *         description: Tuyến đường được cập nhật thành công
@@ -195,17 +242,17 @@ routeRoutes.get("/location/:locationId", getRoutesByLocation);
  *     tags: [Routes]
  *     parameters:
  *       - in: query
- *         name: startLocationId
+ *         name: originStation
  *         required: true
  *         schema:
  *           type: string
- *         description: ID của điểm xuất phát
+ *         description: ID của bến đi
  *       - in: query
- *         name: endLocationId
+ *         name: destinationStation
  *         required: true
  *         schema:
  *           type: string
- *         description: ID của điểm đến
+ *         description: ID của bến đến
  *     responses:
  *       200:
  *         description: Danh sách tuyến đường tìm thấy

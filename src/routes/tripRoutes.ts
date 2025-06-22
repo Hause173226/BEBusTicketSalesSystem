@@ -6,13 +6,14 @@ import {
   updateTrip,
   deleteTrip,
   searchTrips,
+  createMultipleTrips,
 } from "../controllers/tripController";
 
 const tripRoutes = express.Router();
 
 /**
  * @swagger
- * /api/trip:
+ * /api/trips:
  *   post:
  *     summary: Tạo mới một chuyến xe
  *     tags: [Trips]
@@ -62,6 +63,73 @@ const tripRoutes = express.Router();
  *         description: Lỗi server
  */
 tripRoutes.post("/", createTrip);
+
+/**
+ * @swagger
+ * /api/trips/multiple:
+ *   post:
+ *     summary: Tạo nhiều chuyến xe tự động theo khung giờ
+ *     tags: [Trips]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               tripData:
+ *                 type: object
+ *                 properties:
+ *                   route:
+ *                     type: string
+ *                     description: ID của tuyến đường
+ *                   bus:
+ *                     type: string
+ *                     description: ID của xe
+ *                   departureDate:
+ *                     type: string
+ *                     format: date
+ *                   basePrice:
+ *                     type: number
+ *                   status:
+ *                     type: string
+ *                   availableSeats:
+ *                     type: number
+ *                   notes:
+ *                     type: string
+ *                 required:
+ *                   - route
+ *                   - bus
+ *                   - departureDate
+ *                   - basePrice
+ *               startTime:
+ *                 type: string
+ *                 description: Giờ bắt đầu (định dạng HH:mm, ví dụ 06:00)
+ *               endTime:
+ *                 type: string
+ *                 description: Giờ kết thúc (định dạng HH:mm, ví dụ 18:00)
+ *               intervalHours:
+ *                 type: number
+ *                 description: Khoảng cách giữa các chuyến (giờ)
+ *             required:
+ *               - tripData
+ *               - startTime
+ *               - endTime
+ *     responses:
+ *       201:
+ *         description: Danh sách chuyến xe được tạo thành công
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *       400:
+ *         description: Thiếu thông tin đầu vào
+ *       500:
+ *         description: Lỗi server
+ */
+tripRoutes.post("/multiple", createMultipleTrips);
 
 /**
  * @swagger
@@ -149,7 +217,7 @@ tripRoutes.get("/search", searchTrips);
 
 /**
  * @swagger
- * /api/trip/{id}:
+ * /api/trips/{id}:
  *   get:
  *     summary: Lấy thông tin một chuyến xe theo ID
  *     tags: [Trips]
@@ -172,7 +240,7 @@ tripRoutes.get("/:id", getTripById);
 
 /**
  * @swagger
- * /api/trip/{id}:
+ * /api/trips/{id}:
  *   put:
  *     summary: Cập nhật thông tin chuyến xe
  *     tags: [Trips]
@@ -215,7 +283,7 @@ tripRoutes.put("/:id", updateTrip);
 
 /**
  * @swagger
- * /api/trip/{id}:
+ * /api/trips/{id}:
  *   delete:
  *     summary: Xóa một chuyến xe
  *     tags: [Trips]

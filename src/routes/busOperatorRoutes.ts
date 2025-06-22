@@ -23,8 +23,17 @@ const busOperatorRoutes = express.Router();
  *             properties:
  *               name:
  *                 type: string
+ *               phone:
+ *                 type: string
+ *               email:
+ *                 type: string
  *               address:
  *                 type: string
+ *               licenseNumber:
+ *                 type: string
+ *               status:
+ *                 type: string
+ *                 enum: [active, inactive]
  *             required:
  *               - name
  *     responses:
@@ -50,6 +59,25 @@ busOperatorRoutes.post("/", createBusOperator);
  *               type: array
  *               items:
  *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                   name:
+ *                     type: string
+ *                   phone:
+ *                     type: string
+ *                   email:
+ *                     type: string
+ *                   address:
+ *                     type: string
+ *                   licenseNumber:
+ *                     type: string
+ *                   status:
+ *                     type: string
+ *                   createdAt:
+ *                     type: string
+ *                   updatedAt:
+ *                     type: string
  *       500:
  *         description: Lỗi server
  */
@@ -74,6 +102,20 @@ busOperatorRoutes.get("/", getAllBusOperators);
  *         application/json:
  *           schema:
  *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               address:
+ *                 type: string
+ *               licenseNumber:
+ *                 type: string
+ *               status:
+ *                 type: string
+ *                 enum: [active, inactive]
  *     responses:
  *       200:
  *         description: Cập nhật bus operator thành công

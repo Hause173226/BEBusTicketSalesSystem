@@ -11,5 +11,6 @@ export interface ITrip {
   discountPercentage?: number;
   status?: "scheduled" | "in_progress" | "completed" | "cancelled";
   availableSeats?: number;
+  estimatedDuration?: number; // Estimated duration in minutes
   notes?: string;
 }

@@ -4,6 +4,7 @@ import {
   deleteStation,
   getAllStations,
   getStationById,
+  getStationNamesAndCities,
   updateStation,
 } from "../controllers/stationController";
 
@@ -72,6 +73,39 @@ router.post("/", createStation);
  *         description: Lỗi server
  */
 router.get("/", getAllStations);
+
+/**
+ * @swagger
+ * /api/station/city-names:
+ *   get:
+ *     summary: Lấy danh sách các trạm với tên và thành phố
+ *     tags: [Stations]
+ *     responses:
+ *       200:
+ *         description: Danh sách trạm gồm _id, name và address.city
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                     description: ID của trạm
+ *                   name:
+ *                     type: string
+ *                     description: Tên trạm
+ *                   address:
+ *                     type: object
+ *                     properties:
+ *                       city:
+ *                         type: string
+ *                         description: Thành phố
+ *       500:
+ *         description: Lỗi server
+ */
+router.get("/city-names", getStationNamesAndCities);
 
 /**
  * @swagger
@@ -158,4 +192,4 @@ router.put("/:id", updateStation);
  */
 router.delete("/:id", deleteStation);
 
-export default router; 
+export default router;
