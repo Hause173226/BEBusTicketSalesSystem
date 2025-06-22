@@ -3,26 +3,30 @@ import { IBooking } from "../interfaces/IBooking";
 
 export const bookingService = {
   createBooking: async (bookingData: Partial<IBooking>) => {
+    // Tạo bookingCode: B + 5 số ngẫu nhiên
+    const randomNumber = Math.floor(10000 + Math.random() * 90000); // 5 số
+    bookingData.bookingCode = `B${randomNumber}`;
+
     const booking = await Booking.create(bookingData);
     return booking;
   },
 
   getAllBookings: async () => {
     const bookings = await Booking.find()
-      .populate('customer')
-      .populate('trip')
-      .populate('pickupStation')
-      .populate('dropoffStation')
+      .populate("customer")
+      .populate("trip")
+      .populate("pickupStation")
+      .populate("dropoffStation")
       .lean();
     return bookings;
   },
 
   getBookingById: async (bookingId: string) => {
     const booking = await Booking.findById(bookingId)
-      .populate('customer')
-      .populate('trip')
-      .populate('pickupStation')
-      .populate('dropoffStation');
+      .populate("customer")
+      .populate("trip")
+      .populate("pickupStation")
+      .populate("dropoffStation");
     if (!booking) {
       throw new Error("Booking not found");
     }
@@ -30,14 +34,13 @@ export const bookingService = {
   },
 
   updateBooking: async (bookingId: string, updateData: Partial<IBooking>) => {
-    const booking = await Booking.findByIdAndUpdate(
-      bookingId,
-      updateData,
-      { new: true }
-    ).populate('customer')
-     .populate('trip')
-     .populate('pickupStation')
-     .populate('dropoffStation');
+    const booking = await Booking.findByIdAndUpdate(bookingId, updateData, {
+      new: true,
+    })
+      .populate("customer")
+      .populate("trip")
+      .populate("pickupStation")
+      .populate("dropoffStation");
 
     if (!booking) {
       throw new Error("Failed to update booking");
@@ -55,9 +58,9 @@ export const bookingService = {
 
   getBookingsByCustomer: async (customerId: string) => {
     const bookings = await Booking.find({ customer: customerId })
-      .populate('trip')
-      .populate('pickupStation')
-      .populate('dropoffStation')
+      .populate("trip")
+      .populate("pickupStation")
+      .populate("dropoffStation")
       .lean();
     return bookings;
   },
@@ -77,9 +80,9 @@ export const bookingService = {
   updatePaymentStatus: async (bookingId: string, status: string) => {
     const booking = await Booking.findByIdAndUpdate(
       bookingId,
-      { 
+      {
         paymentStatus: status,
-        paymentDate: status === 'paid' ? new Date() : undefined
+        paymentDate: status === "paid" ? new Date() : undefined,
       },
       { new: true }
     );
@@ -87,5 +90,5 @@ export const bookingService = {
       throw new Error("Failed to update payment status");
     }
     return booking;
-  }
-}; 
+  },
+};

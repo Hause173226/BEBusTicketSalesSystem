@@ -6,17 +6,29 @@ const bookingSchema = new Schema<IBooking>(
     bookingCode: { type: String, required: true, unique: true },
     customer: { type: Schema.Types.ObjectId, ref: "Customer", required: true },
     trip: { type: Schema.Types.ObjectId, ref: "Trip", required: true },
-    pickupStation: { type: Schema.Types.ObjectId, ref: "Station", required: true },
-    dropoffStation: { type: Schema.Types.ObjectId, ref: "Station", required: true },
+    pickupStation: {
+      type: Schema.Types.ObjectId,
+      ref: "Station",
+      required: true,
+    },
+    dropoffStation: {
+      type: Schema.Types.ObjectId,
+      ref: "Station",
+      required: true,
+    },
+    seatNumbers: {
+      type: [String], // hoặc [Number] nếu ghế là số
+      required: true,
+    },
     totalAmount: { type: Number, required: true },
     bookingStatus: {
       type: String,
-      enum: ["pending", "confirmed", "paid", "cancelled", "refunded"],
+      enum: ["pending", "paid", "cancelled"],
       default: "pending",
     },
     paymentStatus: {
       type: String,
-      enum: ["unpaid", "paid", "refunded"],
+      enum: ["unpaid", "paid"],
       default: "unpaid",
     },
     paymentMethod: {
@@ -24,9 +36,7 @@ const bookingSchema = new Schema<IBooking>(
       enum: ["cash", "bank_transfer", "credit_card", "e_wallet", "online"],
       default: "cash",
     },
-    bookingDate: { type: Date, default: Date.now },
     paymentDate: { type: Date },
-    notes: { type: String },
   },
   { timestamps: true }
 );

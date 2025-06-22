@@ -19,6 +19,15 @@ export const getAllStations = async (req: Request, res: Response) => {
   }
 };
 
+export const getStationNamesAndCities = async (req: Request, res: Response) => {
+  try {
+    const stations = await stationService.getStationNamesAndCities();
+    res.json(stations);
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 export const getStationById = async (req: Request, res: Response) => {
   try {
     const stationId = req.params.id;
@@ -59,4 +68,4 @@ export const deleteStation = async (req: Request, res: Response) => {
       res.status(500).json({ error: "Internal Server Error" });
     }
   }
-}; 
+};

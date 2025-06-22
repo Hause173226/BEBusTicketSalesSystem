@@ -10,7 +10,7 @@ const busRoutes = express.Router();
 
 /**
  * @swagger
- * /api/bus:
+ * /api/buses:
  *   post:
  *     summary: Tạo mới một bus
  *     tags: [Buses]
@@ -25,12 +25,20 @@ const busRoutes = express.Router();
  *                 type: string
  *               operator:
  *                 type: string
- *                 description: ID của operator (nếu có reference)
+ *                 description: ID của operator (bắt buộc)
+ *               busType:
+ *                 type: string
+ *                 enum: [standard, sleeper, limousine, vip]
  *               seatCount:
  *                 type: number
+ *               status:
+ *                 type: string
+ *                 enum: [active, maintenance, inactive]
  *             required:
  *               - licensePlate
  *               - operator
+ *               - busType
+ *               - seatCount
  *     responses:
  *       201:
  *         description: Bus được tạo thành công
@@ -41,7 +49,7 @@ busRoutes.post("/", createBus);
 
 /**
  * @swagger
- * /api/bus:
+ * /api/buses:
  *   get:
  *     summary: Lấy danh sách tất cả bus
  *     tags: [Buses]
@@ -54,6 +62,23 @@ busRoutes.post("/", createBus);
  *               type: array
  *               items:
  *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                   operator:
+ *                     type: string
+ *                   licensePlate:
+ *                     type: string
+ *                   busType:
+ *                     type: string
+ *                   seatCount:
+ *                     type: number
+ *                   status:
+ *                     type: string
+ *                   createdAt:
+ *                     type: string
+ *                   updatedAt:
+ *                     type: string
  *       500:
  *         description: Lỗi server
  */
@@ -61,7 +86,7 @@ busRoutes.get("/", getAllBuses);
 
 /**
  * @swagger
- * /api/bus/{id}:
+ * /api/buses/{id}:
  *   put:
  *     summary: Cập nhật thông tin bus
  *     tags: [Buses]
@@ -78,6 +103,19 @@ busRoutes.get("/", getAllBuses);
  *         application/json:
  *           schema:
  *             type: object
+ *             properties:
+ *               operator:
+ *                 type: string
+ *               licensePlate:
+ *                 type: string
+ *               busType:
+ *                 type: string
+ *                 enum: [standard, sleeper, limousine, vip]
+ *               seatCount:
+ *                 type: number
+ *               status:
+ *                 type: string
+ *                 enum: [active, maintenance, inactive]
  *     responses:
  *       200:
  *         description: Cập nhật bus thành công
@@ -90,7 +128,7 @@ busRoutes.put("/:id", updateBus);
 
 /**
  * @swagger
- * /api/bus/{id}:
+ * /api/buses/{id}:
  *   delete:
  *     summary: Xóa một bus theo ID
  *     tags: [Buses]

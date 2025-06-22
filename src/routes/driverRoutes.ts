@@ -10,7 +10,7 @@ const driverRoutes = express.Router();
 
 /**
  * @swagger
- * /api/driver:
+ * /api/drivers:
  *   post:
  *     summary: Tạo mới một driver
  *     tags: [Drivers]
@@ -21,19 +21,21 @@ const driverRoutes = express.Router();
  *           schema:
  *             type: object
  *             properties:
- *               name:
+ *               fullName:
  *                 type: string
  *               phone:
+ *                 type: string
+ *               email:
  *                 type: string
  *               licenseNumber:
  *                 type: string
  *               operator:
  *                 type: string
- *                 description: ID của operator (nếu có reference)
+ *                 description: ID của operator (bắt buộc)
  *             required:
- *               - name
- *               - phone
+ *               - fullName
  *               - licenseNumber
+ *               - operator
  *     responses:
  *       201:
  *         description: Driver được tạo thành công
@@ -44,7 +46,7 @@ driverRoutes.post("/", createDriver);
 
 /**
  * @swagger
- * /api/driver:
+ * /api/drivers:
  *   get:
  *     summary: Lấy danh sách tất cả drivers
  *     tags: [Drivers]
@@ -57,6 +59,25 @@ driverRoutes.post("/", createDriver);
  *               type: array
  *               items:
  *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                   fullName:
+ *                     type: string
+ *                   phone:
+ *                     type: string
+ *                   email:
+ *                     type: string
+ *                   licenseNumber:
+ *                     type: string
+ *                   status:
+ *                     type: string
+ *                   operator:
+ *                     type: string
+ *                   createdAt:
+ *                     type: string
+ *                   updatedAt:
+ *                     type: string
  *       500:
  *         description: Lỗi server
  */
@@ -64,7 +85,7 @@ driverRoutes.get("/", getAllDrivers);
 
 /**
  * @swagger
- * /api/driver/{id}:
+ * /api/drivers/{id}:
  *   put:
  *     summary: Cập nhật thông tin driver
  *     tags: [Drivers]
@@ -81,6 +102,20 @@ driverRoutes.get("/", getAllDrivers);
  *         application/json:
  *           schema:
  *             type: object
+ *             properties:
+ *               fullName:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               licenseNumber:
+ *                 type: string
+ *               status:
+ *                 type: string
+ *                 enum: [active, inactive, suspended]
+ *               operator:
+ *                 type: string
  *     responses:
  *       200:
  *         description: Cập nhật driver thành công
@@ -93,7 +128,7 @@ driverRoutes.put("/:id", updateDriver);
 
 /**
  * @swagger
- * /api/driver/{id}:
+ * /api/drivers/{id}:
  *   delete:
  *     summary: Xóa một driver theo ID
  *     tags: [Drivers]

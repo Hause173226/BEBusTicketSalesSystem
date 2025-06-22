@@ -10,6 +10,31 @@ export const createTrip = async (req: Request, res: Response) => {
   }
 };
 
+export const createMultipleTrips = async (req: Request, res: Response) => {
+  console.log("1");
+
+  try {
+    const { tripData, startTime, endTime, intervalHours } = req.body;
+    console.log("2", tripData, startTime, endTime, intervalHours);
+
+    if (!tripData || !startTime || !endTime) {
+      res.status(400).json({ error: "Missing required fields" });
+      return;
+    }
+    const trips = await tripService.createMultipleTrips(
+      tripData,
+      startTime,
+      endTime,
+      intervalHours || 2
+    );
+    console.log("3", trips);
+
+    res.status(201).json(trips);
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 export const getAllTrips = async (req: Request, res: Response) => {
   try {
     const trips = await tripService.getAllTrips();
