@@ -17,6 +17,7 @@ import seatRoutes from "./routes/seatRoutes";
 import driverRoutes from "./routes/driverRoutes";
 import busOperatorRoutes from "./routes/busOperatorRoutes";
 import busRoutes from "./routes/busRoutes";
+import paymentRouter from "./routes/paymentRoutes";
 
 const app = express();
 
@@ -26,7 +27,7 @@ const app = express();
 //       "http://localhost:5173",
 //       "http://localhost:5174",
 //       "https://sdn-fe.vercel.app",
-//     ], // Thay bằng domain FE thật của bạn
+//     ],
 //     credentials: true,
 //     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
 //     allowedHeaders: ["Content-Type", "Authorization"],
@@ -49,6 +50,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/trips", tripRoutes);
 app.use("/api/route", routeRoutes);
 app.use("/api/booking", bookingRoutes);
+app.use("/api/payment", paymentRouter);
 app.use("/api/tickets", ticketRoutes);
 app.use("/api/station", stationRoutes);
 app.use("/api/seat", seatRoutes);
