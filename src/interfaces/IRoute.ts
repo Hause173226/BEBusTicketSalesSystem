@@ -5,7 +5,6 @@ export interface IRoute {
   code?: string;
   originStation: Types.ObjectId;
   destinationStation: Types.ObjectId;
-
   distanceKm?: number;
   estimatedDuration?: number;
   status?: "active" | "inactive";

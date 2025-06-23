@@ -8,8 +8,8 @@ export interface IBooking {
   dropoffStation: Types.ObjectId;
   seatNumbers: string[];
   totalAmount: number;
-  bookingStatus?: "pending" | "confirmed" | "paid" | "cancelled" | "refunded";
-  paymentStatus?: "unpaid" | "paid" | "refunded";
+  bookingStatus?: "pending" | "confirmed" | "paid" | "cancelled";
+  paymentStatus?: "unpaid" | "paid" | "failed";
   paymentMethod?:
     | "cash"
     | "bank_transfer"
@@ -18,6 +18,6 @@ export interface IBooking {
     | "online";
   paymentDate?: Date;
   notes?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
