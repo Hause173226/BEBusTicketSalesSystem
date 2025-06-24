@@ -15,14 +15,16 @@ const customerSchema = new Schema<IUser>(
     isActive: { type: Boolean, default: true }, // Add isActive field
     otpCode: { type: String },
     otpExpires: { type: Date },
+    refreshToken: { type: String }, // Added for JWT refresh token
   },
   { timestamps: true }
 );
 
-// Loại bỏ password khi trả về JSON
+// Loại bỏ password và refreshToken khi trả về JSON
 customerSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj.password;
+  delete obj.refreshToken;
   return obj;
 };
 

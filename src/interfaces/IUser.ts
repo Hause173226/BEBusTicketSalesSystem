@@ -13,4 +13,5 @@ export interface IUser {
   updatedAt?: Date;
   otpCode?: string;
   otpExpires?: Date;
+  refreshToken?: string; // Added for JWT refresh token
 }

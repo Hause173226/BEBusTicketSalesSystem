@@ -12,6 +12,7 @@ import {
   updateUser,
   changePassword,
   changeUserStatus,
+  refreshToken,
 } from "../controllers/userController";
 import { authenticateJWT } from "../middlewares/authenticate";
 
@@ -398,18 +399,56 @@ const userRoutes = express.Router();
  *         description: Lỗi server
  */
 
+/**
+ * @swagger
+ * /api/users/refresh-token:
+ *   post:
+ *     summary: Refresh access token
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *             required:
+ *               - refreshToken
+ *     responses:
+ *       200:
+ *         description: New access token generated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 accessToken:
+ *                   type: string
+ *                 refreshToken:
+ *                   type: string
+ *       401:
+ *         description: Invalid refresh token
+ *       500:
+ *         description: Internal server error
+ */
 
+// Auth routes
 userRoutes.post("/signup", signUp);
 userRoutes.post("/signin", signIn);
+userRoutes.post("/refresh-token", refreshToken);
 userRoutes.post("/forgot-password", forgotPassword);
 userRoutes.post("/resend-otp", resendOTP);
 userRoutes.post("/reset-password", resetPasswordWithOTP);
-userRoutes.post("/signout", signOut);
+userRoutes.post("/signout", authenticateJWT, signOut);
+
+// Protected routes
 userRoutes.get("/", authenticateJWT, getAllUsers);
 userRoutes.get("/:id", authenticateJWT, getUserById);
-userRoutes.delete("/:id", deleteUser);
 userRoutes.put("/:id", authenticateJWT, updateUser);
-userRoutes.put("/change-password/:id", authenticateJWT, changePassword);
-userRoutes.put("/change-status/:id", authenticateJWT, changeUserStatus);
+userRoutes.delete("/:id", authenticateJWT, deleteUser);
+userRoutes.put("/:id/change-password", authenticateJWT, changePassword);
+userRoutes.put("/:id/change-status", authenticateJWT, changeUserStatus);
 
 export default userRoutes;

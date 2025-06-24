@@ -4,6 +4,9 @@ import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
+const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || "your_refresh_token_secret";
+const ACCESS_TOKEN_EXPIRY = "1h"; // Changed to 1 hour
+const REFRESH_TOKEN_EXPIRY = "7d"; // 7 days
 
 const transporter = nodemailer.createTransport({
   service: "gmail", // Hoặc dịch vụ email khác
@@ -73,6 +76,26 @@ export const userService = {
     return userObj;
   },
 
+  generateTokens: async (user: any) => {
+    const accessToken = jwt.sign(
+      { userId: user._id, email: user.email, role: user.role },
+      JWT_SECRET,
+      { expiresIn: ACCESS_TOKEN_EXPIRY }
+    );
+
+    const refreshToken = jwt.sign(
+      { userId: user._id },
+      REFRESH_TOKEN_SECRET,
+      { expiresIn: REFRESH_TOKEN_EXPIRY }
+    );
+
+    // Store refresh token in database
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    return { accessToken, refreshToken };
+  },
+
   signIn: async (email: string, password: string, role?: string) => {
     // Nếu không truyền role thì mặc định là "user"
     const userRole = role || "user";
@@ -84,15 +107,58 @@ export const userService = {
     if (!isMatch)
       throw new Error("Email, mật khẩu hoặc quyền truy cập không đúng");
 
-    const token = jwt.sign(
-      { userId: user._id, email: user.email, role: user.role },
-      JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    const { accessToken, refreshToken } = await userService.generateTokens(user);
 
     const userObj = user.toObject() as any;
     delete userObj.password;
-    return { user: userObj, token };
+    delete userObj.refreshToken;
+
+    return {
+      user: userObj,
+      accessToken,
+      refreshToken
+    };
+  },
+
+  refreshToken: async (refreshToken: string) => {
+    if (!refreshToken) {
+      throw new Error("Refresh token is required");
+    }
+
+    try {
+      // Verify refresh token
+      const decoded = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET) as { userId: string };
+
+      // Find user with this refresh token
+      const user = await Customer.findOne({
+        _id: decoded.userId,
+        refreshToken: refreshToken
+      });
+
+      if (!user) {
+        throw new Error("Invalid refresh token");
+      }
+
+      // Generate new tokens
+      const tokens = await userService.generateTokens(user);
+
+      return tokens;
+    } catch (error) {
+      throw new Error("Invalid refresh token");
+    }
+  },
+
+  signOut: async (userId: string) => {
+    const user = await Customer.findById(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Clear refresh token
+    user.refreshToken = undefined;
+    await user.save();
+
+    return { message: "Đăng xuất thành công" };
   },
 
   sendForgotPasswordOTP: async (email: string) => {
