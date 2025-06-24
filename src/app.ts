@@ -13,7 +13,6 @@ import stationRoutes from "./routes/stationRoutes";
 import tripRoutes from "./routes/tripRoutes";
 import bookingRoutes from "./routes/bookingRoutes";
 import routeRoutes from "./routes/routeRoutes";
-import seatRoutes from "./routes/seatRoutes";
 import driverRoutes from "./routes/driverRoutes";
 import busOperatorRoutes from "./routes/busOperatorRoutes";
 import busRoutes from "./routes/busRoutes";
@@ -34,7 +33,7 @@ const app = express();
 //   })
 // );
 const allowedOrigins =
-  process.env.NODE_ENV === "production" ? ["https://your-frontend.com"] : true;
+  process.env.NODE_ENV === "production" ? ["https://sdn-fe.vercel.app"] : true;
 
 app.use(
   cors({
@@ -53,7 +52,6 @@ app.use("/api/booking", bookingRoutes);
 app.use("/api/payment", paymentRouter);
 app.use("/api/tickets", ticketRoutes);
 app.use("/api/station", stationRoutes);
-app.use("/api/seat", seatRoutes);
 app.use("/api/ticket-history", ticketHistoryRoutes);
 app.use("/api/drivers", driverRoutes);
 app.use("/api/bus-operator", busOperatorRoutes);
