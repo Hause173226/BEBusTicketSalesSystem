@@ -32,6 +32,24 @@ export const signIn = async (req: Request, res: Response) => {
   }
 };
 
+export const refreshToken = async (req: Request, res: Response) => {
+  try {
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+      res.status(400).json({ error: "Refresh token is required" });
+      return;
+    }
+    const tokens = await userService.refreshToken(refreshToken);
+    res.json(tokens);
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(401).json({ error: err.message });
+    } else {
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  }
+};
+
 export const forgotPassword = async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
@@ -86,9 +104,17 @@ export const resetPasswordWithOTP = async (req: Request, res: Response) => {
 };
 
 export const signOut = async (req: Request, res: Response) => {
-  // Nếu dùng cookie để lưu token:
-  // res.clearCookie("token");
-  res.status(200).json({ message: "Đăng xuất thành công" });
+  try {
+    const userId = (req as any).user.userId; // Assuming this comes from auth middleware
+    await userService.signOut(userId);
+    res.status(200).json({ message: "Đăng xuất thành công" });
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(400).json({ error: err.message });
+    } else {
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  }
 };
 
 export const getAllUsers = async (req: Request, res: Response) => {
