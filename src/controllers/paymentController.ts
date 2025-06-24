@@ -77,8 +77,7 @@ export const vnpayReturn = async (req: Request, res: Response) => {
       }
 
       res.redirect(
-        `${config.frontendUrl}/payment-failed?code=${
-          result.responseCode
+        `${config.frontendUrl}/payment-failed?code=${result.responseCode
         }&message=${encodeURIComponent(message)}&orderId=${result.orderId}`
       );
     }
