@@ -19,4 +19,18 @@ export const bookingController = {
       res.status(500).json({ message: error.message });
     }
   },
+
+  getBookingHistory: async (req: Request, res: Response) => {
+    try {
+      const { customerId } = req.params;
+      const bookings = await bookingService.getBookingHistory(customerId);
+      if (!bookings || bookings.length === 0) {
+        res.status(404).json({ message: "No bookings found for this user." });
+        return;
+      }
+      res.json(bookings);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  },
 };
