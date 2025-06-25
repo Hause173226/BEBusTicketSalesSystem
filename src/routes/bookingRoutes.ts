@@ -68,6 +68,16 @@ bookingRoutes.post("/", authenticateJWT, bookingController.createBooking);
  *                     type: string
  *                   trip:
  *                     type: object
+ *                     properties:
+ *                       route:
+ *                         type: object
+ *                         properties:
+ *                           name:
+ *                             type: string
+ *                           originStation:
+ *                             type: object
+ *                           destinationStation:
+ *                             type: object
  *                   customer:
  *                     type: object
  *                   seatNumber:
