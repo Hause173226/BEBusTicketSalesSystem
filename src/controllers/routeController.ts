@@ -6,7 +6,14 @@ export const createRoute = async (req: Request, res: Response) => {
     const route = await routeService.createRoute(req.body);
     res.status(201).json(route);
   } catch (err) {
-    res.status(500).json({ error: "Internal Server Error" });
+    if (
+      err instanceof Error &&
+      err.message === "Route with the same origin and destination already exists"
+    ) {
+      res.status(400).json({ error: "Tuyến đường với điểm đi và đến này đã tồn tại" });
+    } else {
+      res.status(500).json({ error: "Internal Server Error" });
+    }
   }
 };
 

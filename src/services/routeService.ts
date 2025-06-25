@@ -4,6 +4,14 @@ import { IRoute } from "../interfaces/IRoute";
 export const routeService = {
   // Create a new route
   createRoute: async (routeData: Partial<IRoute>) => {
+    // Kiểm tra trùng tuyến
+    const existed = await Route.findOne({
+      originStation: routeData.originStation,
+      destinationStation: routeData.destinationStation,
+    });
+    if (existed) {
+      throw new Error("Route with the same origin and destination already exists");
+    }
     const route = await Route.create(routeData);
     return route;
   },
