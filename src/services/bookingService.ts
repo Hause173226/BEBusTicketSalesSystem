@@ -55,7 +55,17 @@ export const bookingService = {
   getAllBookings: async () => {
     const bookings = await Booking.find()
       .populate("customer")
-      .populate("trip")
+      .populate({
+        path: "trip",
+        populate: {
+          path: "route",
+          select: "name originStation destinationStation",
+          populate: [
+            { path: "originStation", select: "name address" },
+            { path: "destinationStation", select: "name address" }
+          ]
+        }
+      })
       .populate("pickupStation")
       .populate("dropoffStation")
       .lean();
