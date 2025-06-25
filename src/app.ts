@@ -20,18 +20,6 @@ import paymentRouter from "./routes/paymentRoutes";
 
 const app = express();
 
-// app.use(
-//   cors({
-//     origin: [
-//       "http://localhost:5173",
-//       "http://localhost:5174",
-//       "https://fe-bus-ticket-sales-system.vercel.app",
-//     ],
-//     credentials: true,
-//     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-//     allowedHeaders: ["Content-Type", "Authorization"],
-//   })
-// );
 const allowedOrigins =
   process.env.NODE_ENV === "production"
     ? [
