@@ -5,7 +5,6 @@ const seatSchema = new Schema<ISeat>(
   {
     bus: { type: Schema.Types.ObjectId, ref: "Bus", required: true },
     seatNumber: { type: String, required: true },
-    isAvailable: { type: Boolean, default: true },
   },
   { timestamps: true }
 );

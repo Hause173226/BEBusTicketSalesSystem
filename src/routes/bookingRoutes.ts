@@ -112,4 +112,32 @@ bookingRoutes.get(
   bookingController.getBookingHistory
 );
 
+/**
+ * @swagger
+ * /api/booking/cancel/{bookingId}:
+ *   put:
+ *     summary: Hủy booking
+ *     tags: [Bookings]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: bookingId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Hủy booking thành công
+ *       400:
+ *         description: Lỗi hủy booking
+ *       404:
+ *         description: Không tìm thấy booking
+ */
+bookingRoutes.put(
+  "/cancel/:bookingId",
+  authenticateJWT,
+  bookingController.cancelBooking
+);
+
 export default bookingRoutes;
