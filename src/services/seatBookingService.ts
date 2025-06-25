@@ -100,15 +100,30 @@ export class SeatBookingService {
       // Cleanup expired locks trước
       await this.cleanupExpiredLocks(tripId);
 
-      // Tìm seat IDs từ seat numbers
-      const seats = await Seat.find({ seatNumber: { $in: seatNumbers } });
+      // 🔥 THÊM: Lấy busId từ trip
+      const seatBookings = await SeatBooking.find({ trip: tripId })
+        .populate("seat")
+        .limit(1);
+
+      if (seatBookings.length === 0) {
+        throw new Error("Trip not initialized. Please run init API first.");
+      }
+
+      const busId = (seatBookings[0].seat as any).bus;
+      const seats = await Seat.find({
+        seatNumber: { $in: seatNumbers },
+        bus: busId, // Thêm điều kiện này
+      });
+
       if (seats.length !== seatNumbers.length) {
         const foundSeatNumbers = seats.map((s) => s.seatNumber);
         const notFound = seatNumbers.filter(
           (sn) => !foundSeatNumbers.includes(sn)
         );
-        throw new Error(`Seats not found: ${notFound.join(", ")}`);
+        throw new Error(`Seats not found in this bus: ${notFound.join(", ")}`);
       }
+
+      // ... rest of the code remains the same
       const seatIds = seats.map((s) => s._id);
 
       // Kiểm tra ghế có available không
@@ -155,26 +170,20 @@ export class SeatBookingService {
   // Hủy chọn ghế
   static async releaseSeatSelection(tripId: string, seatNumbers: string[]) {
     try {
-      const seats = await Seat.find({ seatNumber: { $in: seatNumbers } });
+      // Lấy busId từ trip
+      const seatBookings = await SeatBooking.find({ trip: tripId })
+        .populate("seat")
+        .limit(1);
+      const busId = (seatBookings[0].seat as any).bus;
+
+      // Tìm ghế theo busId
+      const seats = await Seat.find({
+        seatNumber: { $in: seatNumbers },
+        bus: busId,
+      });
       const seatIds = seats.map((s) => s._id);
 
-      const result = await SeatBooking.updateMany(
-        {
-          trip: tripId,
-          seat: { $in: seatIds },
-          status: "selected",
-        },
-        {
-          status: "available",
-          $unset: { lockedUntil: 1 },
-        }
-      );
-
-      return {
-        success: true,
-        message: `Released ${result.modifiedCount} seats`,
-        releasedCount: result.modifiedCount,
-      };
+      // ... rest of code
     } catch (error) {
       throw error;
     }
@@ -187,34 +196,20 @@ export class SeatBookingService {
     bookingId: string
   ) {
     try {
-      const seats = await Seat.find({ seatNumber: { $in: seatNumbers } });
+      // Lấy busId từ trip
+      const seatBookings = await SeatBooking.find({ trip: tripId })
+        .populate("seat")
+        .limit(1);
+      const busId = (seatBookings[0].seat as any).bus;
+
+      // Tìm ghế theo busId
+      const seats = await Seat.find({
+        seatNumber: { $in: seatNumbers },
+        bus: busId,
+      });
       const seatIds = seats.map((s) => s._id);
 
-      const result = await SeatBooking.updateMany(
-        {
-          trip: tripId,
-          seat: { $in: seatIds },
-          status: "selected",
-        },
-        {
-          status: "booked",
-          booking: bookingId,
-          $unset: { lockedUntil: 1 },
-        }
-      );
-
-      if (result.modifiedCount !== seatNumbers.length) {
-        throw new Error(
-          "Some seats could not be confirmed. They may have expired or been released."
-        );
-      }
-
-      return {
-        success: true,
-        message: `Confirmed booking for ${seatNumbers.length} seats`,
-        seatNumbers,
-        bookingId,
-      };
+      // ... rest of code
     } catch (error) {
       throw error;
     }
@@ -273,26 +268,20 @@ export class SeatBookingService {
   // Hủy booking (chuyển từ booked -> available)
   static async cancelBooking(tripId: string, seatNumbers: string[]) {
     try {
-      const seats = await Seat.find({ seatNumber: { $in: seatNumbers } });
+      // Lấy busId từ trip
+      const seatBookings = await SeatBooking.find({ trip: tripId })
+        .populate("seat")
+        .limit(1);
+      const busId = (seatBookings[0].seat as any).bus;
+
+      // Tìm ghế theo busId
+      const seats = await Seat.find({
+        seatNumber: { $in: seatNumbers },
+        bus: busId,
+      });
       const seatIds = seats.map((s) => s._id);
 
-      const result = await SeatBooking.updateMany(
-        {
-          trip: tripId,
-          seat: { $in: seatIds },
-          status: "booked",
-        },
-        {
-          status: "available",
-          $unset: { booking: 1 },
-        }
-      );
-
-      return {
-        success: true,
-        message: `Cancelled booking for ${result.modifiedCount} seats`,
-        cancelledCount: result.modifiedCount,
-      };
+      // ... rest of code
     } catch (error) {
       throw error;
     }
