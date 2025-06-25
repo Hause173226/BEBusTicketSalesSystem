@@ -20,4 +20,13 @@ export const bookingService = {
       .lean();
     return bookings;
   },
+
+  getBookingHistory: async (customerId: string) => {
+    const bookings = await Booking.find({ customer: customerId })
+      .populate("trip")
+      .populate("pickupStation")
+      .populate("dropoffStation")
+      .lean();
+    return bookings;
+  },
 };

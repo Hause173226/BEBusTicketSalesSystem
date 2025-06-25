@@ -85,4 +85,31 @@ bookingRoutes.post("/", authenticateJWT, bookingController.createBooking);
  */
 bookingRoutes.get("/", authenticateJWT, bookingController.getAllBookings);
 
+/**
+ * @swagger
+ * /api/booking/history/{customerId}:
+ *   get:
+ *     summary: Lấy lịch sử booking của một user
+ *     tags: [Bookings]
+ *     parameters:
+ *       - in: path
+ *         name: customerId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID của khách hàng
+ *     responses:
+ *       200:
+ *         description: Danh sách bookings của user
+ *       404:
+ *         description: Không tìm thấy booking
+ *       500:
+ *         description: Lỗi server
+ */
+bookingRoutes.get(
+  "/history/:customerId",
+  authenticateJWT,
+  bookingController.getBookingHistory
+);
+
 export default bookingRoutes;
