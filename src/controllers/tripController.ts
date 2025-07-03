@@ -3,7 +3,11 @@ import { tripService } from "../services/tripService";
 
 export const createTrip = async (req: Request, res: Response) => {
   try {
+    console.log("1");
+
     const trip = await tripService.createTrip(req.body);
+    console.log("2");
+
     res.status(201).json(trip);
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error" });
