@@ -58,7 +58,7 @@ export const tripService = {
 
   // Get all trips with optional population of related fields
   getAllTrips: async () => {
-    const trips = await Trip.find().populate("route").populate("bus").lean();
+    const trips = await Trip.find().populate("route").populate("bus");
     return trips;
   },
 

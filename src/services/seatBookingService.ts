@@ -244,7 +244,22 @@ export class SeatBookingService {
       const query: any = { trip: tripId, status: "selected" };
 
       if (seatNumbers && seatNumbers.length > 0) {
-        const seats = await Seat.find({ seatNumber: { $in: seatNumbers } });
+        const seatBookings = await SeatBooking.find({ trip: tripId })
+          .populate("seat")
+          .limit(1);
+
+        if (seatBookings.length === 0) {
+          throw new Error("Trip not initialized");
+        }
+
+        const busId = (seatBookings[0].seat as any).bus;
+
+        // Tìm ghế theo busId
+        const seats = await Seat.find({
+          seatNumber: { $in: seatNumbers },
+          bus: busId,
+        });
+
         const seatIds = seats.map((s) => s._id);
         query.seat = { $in: seatIds };
       }

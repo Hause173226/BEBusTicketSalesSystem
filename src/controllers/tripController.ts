@@ -4,6 +4,7 @@ import { tripService } from "../services/tripService";
 export const createTrip = async (req: Request, res: Response) => {
   try {
     const trip = await tripService.createTrip(req.body);
+
     res.status(201).json(trip);
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error" });
@@ -11,11 +12,8 @@ export const createTrip = async (req: Request, res: Response) => {
 };
 
 export const createMultipleTrips = async (req: Request, res: Response) => {
-  console.log("1");
-
   try {
     const { tripData, startTime, endTime, intervalHours } = req.body;
-    console.log("2", tripData, startTime, endTime, intervalHours);
 
     if (!tripData || !startTime || !endTime) {
       res.status(400).json({ error: "Missing required fields" });
@@ -27,7 +25,6 @@ export const createMultipleTrips = async (req: Request, res: Response) => {
       endTime,
       intervalHours || 2
     );
-    console.log("3", trips);
 
     res.status(201).json(trips);
   } catch (err) {
