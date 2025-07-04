@@ -253,6 +253,73 @@ export const userService = {
     return userObj;
   },
 
+  updateProfile: async (userId: string, updateData: any) => {
+    const user = await Customer.findById(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Validate and sanitize input data
+    const allowedFields = [
+      'fullName', 
+      'phone', 
+      'email', 
+      'citizenId', 
+      'dateOfBirth', 
+      'gender', 
+      'address'
+    ];
+    
+    // Remove fields that are not allowed to be updated
+    const filteredUpdateData: any = {};
+    allowedFields.forEach(field => {
+      if (updateData[field] !== undefined) {
+        filteredUpdateData[field] = updateData[field];
+      }
+    });
+
+    // Validate email format if provided
+    if (filteredUpdateData.email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(filteredUpdateData.email)) {
+        throw new Error("Định dạng email không hợp lệ");
+      }
+    }
+
+    // Validate phone format if provided
+    if (filteredUpdateData.phone) {
+      const phoneRegex = /^[0-9]{10}$/;
+      if (!phoneRegex.test(filteredUpdateData.phone)) {
+        throw new Error("Số điện thoại phải có 10 chữ số");
+      }
+    }
+
+    // Check if email or phone already exists (exclude current user)
+    if (filteredUpdateData.email || filteredUpdateData.phone) {
+      const existingUser = await Customer.findOne({
+        _id: { $ne: userId },
+        $or: [
+          ...(filteredUpdateData.email ? [{ email: filteredUpdateData.email }] : []),
+          ...(filteredUpdateData.phone ? [{ phone: filteredUpdateData.phone }] : [])
+        ]
+      });
+      
+      if (existingUser) {
+        throw new Error("Email hoặc số điện thoại đã được sử dụng");
+      }
+    }
+
+    // Update fields
+    Object.keys(filteredUpdateData).forEach((key) => {
+      (user as any)[key] = filteredUpdateData[key];
+    });
+
+    await user.save();
+    const userObj = user.toObject() as any;
+    delete userObj.password;
+    return userObj;
+  },
+
   changePassword: async (userId: string, newPassword: string) => {
     const user = await Customer.findById(userId);
     if (!user) {
