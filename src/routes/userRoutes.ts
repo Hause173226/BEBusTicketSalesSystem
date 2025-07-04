@@ -13,6 +13,8 @@ import {
   changePassword,
   changeUserStatus,
   refreshToken,
+  updateProfile,
+  getProfile,
 } from "../controllers/userController";
 import { authenticateJWT } from "../middlewares/authenticate";
 
@@ -434,6 +436,140 @@ const userRoutes = express.Router();
  *         description: Internal server error
  */
 
+/**
+ * @swagger
+ * /api/users/profile:
+ *   get:
+ *     summary: Lấy thông tin profile của user hiện tại
+ *     tags: [User Profile]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Thông tin profile được trả về thành công
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                   type: string
+ *                 fullName:
+ *                   type: string
+ *                 phone:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 citizenId:
+ *                   type: string
+ *                 dateOfBirth:
+ *                   type: string
+ *                   format: date
+ *                 gender:
+ *                   type: string
+ *                   enum: [male, female, other]
+ *                 address:
+ *                   type: string
+ *                 role:
+ *                   type: string
+ *                   enum: [user, admin]
+ *                 isActive:
+ *                   type: boolean
+ *                 createdAt:
+ *                   type: string
+ *                   format: date-time
+ *                 updatedAt:
+ *                   type: string
+ *                   format: date-time
+ *       401:
+ *         description: Unauthorized - Token không hợp lệ
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal server error
+ *   put:
+ *     summary: Cập nhật thông tin profile của user hiện tại
+ *     tags: [User Profile]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               fullName:
+ *                 type: string
+ *                 description: Họ và tên
+ *               phone:
+ *                 type: string
+ *                 description: Số điện thoại (10 chữ số)
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Email
+ *               citizenId:
+ *                 type: string
+ *                 description: Số CCCD/CMND
+ *               dateOfBirth:
+ *                 type: string
+ *                 format: date
+ *                 description: Ngày sinh
+ *               gender:
+ *                 type: string
+ *                 enum: [male, female, other]
+ *                 description: Giới tính
+ *               address:
+ *                 type: string
+ *                 description: Địa chỉ
+ *     responses:
+ *       200:
+ *         description: Cập nhật profile thành công
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                   type: string
+ *                 fullName:
+ *                   type: string
+ *                 phone:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 citizenId:
+ *                   type: string
+ *                 dateOfBirth:
+ *                   type: string
+ *                   format: date
+ *                 gender:
+ *                   type: string
+ *                   enum: [male, female, other]
+ *                 address:
+ *                   type: string
+ *                 role:
+ *                   type: string
+ *                   enum: [user, admin]
+ *                 isActive:
+ *                   type: boolean
+ *                 createdAt:
+ *                   type: string
+ *                   format: date-time
+ *                 updatedAt:
+ *                   type: string
+ *                   format: date-time
+ *       400:
+ *         description: Dữ liệu không hợp lệ
+ *       401:
+ *         description: Unauthorized - Token không hợp lệ
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal server error
+ */
+
 // Auth routes
 userRoutes.post("/signup", signUp);
 userRoutes.post("/signin", signIn);
@@ -442,6 +578,10 @@ userRoutes.post("/forgot-password", forgotPassword);
 userRoutes.post("/resend-otp", resendOTP);
 userRoutes.post("/reset-password", resetPasswordWithOTP);
 userRoutes.post("/signout", authenticateJWT, signOut);
+
+// Profile routes
+userRoutes.get("/profile", authenticateJWT, getProfile);
+userRoutes.put("/profile", authenticateJWT, updateProfile);
 
 // Protected routes
 userRoutes.get("/", authenticateJWT, getAllUsers);
