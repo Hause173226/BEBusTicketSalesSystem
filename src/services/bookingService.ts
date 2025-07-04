@@ -35,11 +35,11 @@ export const bookingService = {
       const booking = await Booking.create(bookingData);
 
       // 4. Xác nhận ghế (chuyển từ 'selected' -> 'booked')
-      await SeatBookingService.confirmSeatBooking(
-        trip.toString(),
-        seatNumbers,
-        booking._id.toString()
-      );
+      // await SeatBookingService.confirmSeatBooking(
+      //   trip.toString(),
+      //   seatNumbers,
+      //   booking._id.toString()
+      // );
 
       // 5. Trả về booking đã tạo
       return {
@@ -62,9 +62,9 @@ export const bookingService = {
           select: "name originStation destinationStation",
           populate: [
             { path: "originStation", select: "name address" },
-            { path: "destinationStation", select: "name address" }
-          ]
-        }
+            { path: "destinationStation", select: "name address" },
+          ],
+        },
       })
       .populate("pickupStation")
       .populate("dropoffStation")
