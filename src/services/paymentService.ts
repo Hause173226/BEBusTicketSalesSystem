@@ -5,6 +5,7 @@ import { Request } from "express";
 import { Booking } from "../models/Booking";
 import { PaymentHistory } from "../models/Payment";
 import { VNPayConfig } from "../config/vnpay";
+import { SeatBookingService } from "./seatBookingService";
 
 // Helper function để sort object
 function sortObject(obj: any) {
@@ -140,7 +141,6 @@ export const handleVNPayReturn = async (vnp_Params: any) => {
     let orderId = vnp_Params["vnp_TxnRef"];
     let responseCode = vnp_Params["vnp_ResponseCode"];
 
-    // Tìm payment history theo transaction ID
     const paymentHistory = await PaymentHistory.findOne({
       transactionId: orderId,
     });
@@ -155,6 +155,18 @@ export const handleVNPayReturn = async (vnp_Params: any) => {
           booking.bookingStatus = "confirmed";
           booking.paymentDate = new Date();
           await booking.save();
+
+          // THÊM: Confirm ghế từ selected → booked
+          try {
+            await SeatBookingService.confirmSeatBooking(
+              booking.trip.toString(),
+              booking.seatNumbers,
+              booking._id.toString()
+            );
+          } catch (seatError) {
+            console.error("Error confirming seats:", seatError);
+            // Log error nhưng không throw để không ảnh hưởng payment flow
+          }
         }
 
         paymentHistory.paymentStatus = "success";
@@ -168,6 +180,20 @@ export const handleVNPayReturn = async (vnp_Params: any) => {
           booking.paymentStatus = "failed";
           booking.bookingStatus = "cancelled";
           await booking.save();
+
+          // THÊM: Release ghế về available
+          try {
+            await SeatBookingService.releaseSeatSelection(
+              booking.trip.toString(),
+              booking.seatNumbers
+            );
+            console.log(
+              "Seats released for failed payment:",
+              booking.bookingCode
+            );
+          } catch (releaseError) {
+            console.error("Error releasing seats:", releaseError);
+          }
         }
 
         paymentHistory.paymentStatus = "failed";
@@ -190,7 +216,6 @@ export const handleVNPayReturn = async (vnp_Params: any) => {
 
 export const handleVNPayCallback = async (vnp_Params: any) => {
   let secureHash = vnp_Params["vnp_SecureHash"];
-
   let orderId = vnp_Params["vnp_TxnRef"];
   let rspCode = vnp_Params["vnp_ResponseCode"];
 
@@ -203,14 +228,12 @@ export const handleVNPayCallback = async (vnp_Params: any) => {
   let hmac = crypto.createHmac("sha512", VNPayConfig.vnp_HashSecret);
   let signed = hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
 
-  // Tìm payment history
   const paymentHistory = await PaymentHistory.findOne({
     transactionId: orderId,
   });
 
   if (secureHash === signed) {
     if (paymentHistory) {
-      // Kiểm tra số tiền
       let checkAmount =
         vnp_Params["vnp_Amount"] / 100 === paymentHistory.amount;
 
@@ -225,6 +248,21 @@ export const handleVNPayCallback = async (vnp_Params: any) => {
               booking.bookingStatus = "confirmed";
               booking.paymentDate = new Date();
               await booking.save();
+
+              // THÊM: Confirm ghế từ selected → booked
+              try {
+                await SeatBookingService.confirmSeatBooking(
+                  booking.trip.toString(),
+                  booking.seatNumbers,
+                  booking._id.toString()
+                );
+                console.log(
+                  "[Callback] Seats confirmed for booking:",
+                  booking.bookingCode
+                );
+              } catch (seatError) {
+                console.error("[Callback] Error confirming seats:", seatError);
+              }
             }
 
             paymentHistory.paymentStatus = "success";
@@ -238,6 +276,23 @@ export const handleVNPayCallback = async (vnp_Params: any) => {
               booking.paymentStatus = "failed";
               booking.bookingStatus = "cancelled";
               await booking.save();
+
+              // THÊM: Release ghế về available
+              try {
+                await SeatBookingService.releaseSeatSelection(
+                  booking.trip.toString(),
+                  booking.seatNumbers
+                );
+                console.log(
+                  "[Callback] Seats released for failed payment:",
+                  booking.bookingCode
+                );
+              } catch (releaseError) {
+                console.error(
+                  "[Callback] Error releasing seats:",
+                  releaseError
+                );
+              }
             }
 
             paymentHistory.paymentStatus = "failed";
@@ -288,8 +343,8 @@ export const getBookingDetailsByOrderId = async (orderId: string) => {
       .populate({
         path: "trip",
         populate: [
-          { path: "route", select: "name departure arrival" },
-          { path: "bus", select: "busNumber seatLayout" },
+          { path: "route", select: "name code" },
+          { path: "bus", select: "licensePlate busType seatCount" },
         ],
       })
       .populate("pickupStation", "name address")

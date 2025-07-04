@@ -200,6 +200,11 @@ export class SeatBookingService {
       const seatBookings = await SeatBooking.find({ trip: tripId })
         .populate("seat")
         .limit(1);
+
+      if (seatBookings.length === 0) {
+        throw new Error("Trip not initialized");
+      }
+
       const busId = (seatBookings[0].seat as any).bus;
 
       // Tìm ghế theo busId
@@ -207,9 +212,38 @@ export class SeatBookingService {
         seatNumber: { $in: seatNumbers },
         bus: busId,
       });
+
+      if (seats.length !== seatNumbers.length) {
+        throw new Error("Some seats not found in this bus");
+      }
+
       const seatIds = seats.map((s) => s._id);
 
-      // ... rest of code
+      const result = await SeatBooking.updateMany(
+        {
+          trip: tripId,
+          seat: { $in: seatIds },
+          status: "selected", // Chỉ update ghế đang là "selected"
+        },
+        {
+          status: "booked",
+          booking: new Types.ObjectId(bookingId),
+          $unset: { lockedUntil: 1 }, // Xóa thời gian lock
+          // KHÔNG set bookedUntil → ghế sẽ booked vĩnh viễn
+        }
+      );
+
+      if (result.modifiedCount !== seatNumbers.length) {
+        throw new Error(
+          "Some seats were not properly selected or have expired"
+        );
+      }
+
+      return {
+        success: true,
+        message: `${seatNumbers.length} seats confirmed successfully`,
+        modifiedCount: result.modifiedCount,
+      };
     } catch (error) {
       throw error;
     }
