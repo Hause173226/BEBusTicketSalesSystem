@@ -283,7 +283,7 @@ export const getBookingDetailsByOrderId = async (orderId: string) => {
     const booking = await Booking.findById(paymentHistory.booking)
       .populate({
         path: "customer",
-        select: "name email phone", // Chỉ lấy những field cần thiết
+        select: "fullName email phone", // Chỉ lấy những field cần thiết
       })
       .populate({
         path: "trip",
