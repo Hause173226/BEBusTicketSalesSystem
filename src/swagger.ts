@@ -8,6 +8,20 @@ const options = {
       version: "1.0.0",
       description: "API documentation for BE Bus Ticket Sales System",
     },
+    tags: [
+      {
+        name: "Auth",
+        description: "Authentication endpoints"
+      },
+      {
+        name: "User Profile",
+        description: "User profile management endpoints"
+      },
+      {
+        name: "Users",
+        description: "User management endpoints (Admin only)"
+      }
+    ],
     components: {
       securitySchemes: {
         bearerAuth: {
