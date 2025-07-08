@@ -12,7 +12,7 @@ const driverSchema = new Schema<IDriver>(
       enum: ["active", "inactive", "suspended"],
       default: "active",
     },
-    operator: { type: Schema.Types.ObjectId, ref: "BusOperator", required: true },
+    avatar: { type: String }
   },
   { timestamps: true }
 );

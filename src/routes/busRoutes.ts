@@ -23,9 +23,6 @@ const busRoutes = express.Router();
  *             properties:
  *               licensePlate:
  *                 type: string
- *               operator:
- *                 type: string
- *                 description: ID của operator (bắt buộc)
  *               busType:
  *                 type: string
  *                 enum: [standard, sleeper, limousine, vip]
@@ -36,7 +33,6 @@ const busRoutes = express.Router();
  *                 enum: [active, maintenance, inactive]
  *             required:
  *               - licensePlate
- *               - operator
  *               - busType
  *               - seatCount
  *     responses:
@@ -64,8 +60,6 @@ busRoutes.post("/", createBus);
  *                 type: object
  *                 properties:
  *                   _id:
- *                     type: string
- *                   operator:
  *                     type: string
  *                   licensePlate:
  *                     type: string
@@ -104,8 +98,6 @@ busRoutes.get("/", getAllBuses);
  *           schema:
  *             type: object
  *             properties:
- *               operator:
- *                 type: string
  *               licensePlate:
  *                 type: string
  *               busType:

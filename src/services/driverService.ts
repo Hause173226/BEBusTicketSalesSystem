@@ -9,7 +9,7 @@ export const driverService = {
 
   // Lấy tất cả driver
   getAllDrivers: async () => {
-    const drivers = await Driver.find().populate("operator").lean();
+    const drivers = await Driver.find().lean();
     return drivers;
   },
 
