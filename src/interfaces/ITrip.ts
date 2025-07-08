@@ -3,6 +3,7 @@ import { Types } from "mongoose";
 export interface ITrip {
   route: Types.ObjectId;
   bus: Types.ObjectId;
+  driver: Types.ObjectId;
   tripCode?: string;
   departureDate: Date;
   departureTime: string; // Stored as "HH:mm"

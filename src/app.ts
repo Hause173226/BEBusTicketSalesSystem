@@ -15,10 +15,11 @@ import bookingRoutes from "./routes/bookingRoutes";
 import seatBookingRoutes from "./routes/seatBookingRoutes";
 import routeRoutes from "./routes/routeRoutes";
 import driverRoutes from "./routes/driverRoutes";
-import busOperatorRoutes from "./routes/busOperatorRoutes";
 import busRoutes from "./routes/busRoutes";
 import paymentRouter from "./routes/paymentRoutes";
 import seatRoutes from "./routes/seatRoutes";
+import uploadRoutes from "./routes/uploadRoutes";
+import path from "path";
 
 const app = express();
 
@@ -48,8 +49,9 @@ app.use("/api/tickets", ticketRoutes);
 app.use("/api/station", stationRoutes);
 app.use("/api/ticket-history", ticketHistoryRoutes);
 app.use("/api/drivers", driverRoutes);
-app.use("/api/bus-operator", busOperatorRoutes);
 app.use("/api/buses", busRoutes);
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+app.use("/api/upload", uploadRoutes);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use(errorHandler);

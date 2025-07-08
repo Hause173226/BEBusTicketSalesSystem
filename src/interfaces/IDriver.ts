@@ -6,7 +6,7 @@ export interface IDriver {
   email?: string;
   licenseNumber: string;
   status?: "active" | "inactive" | "suspended";
-  operator: Types.ObjectId;
   createdAt?: Date;
   updatedAt?: Date;
+  avatar?: string;
 }

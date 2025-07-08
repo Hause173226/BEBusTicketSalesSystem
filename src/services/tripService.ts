@@ -82,7 +82,7 @@ export const tripService = {
         { path: "originStation", model: "Station" },
         { path: "destinationStation", model: "Station" }
       ]
-    }).populate("bus");
+    }).populate("bus").populate("driver");
     return trips;
   },
 
@@ -94,7 +94,7 @@ export const tripService = {
         { path: "originStation", model: "Station" },
         { path: "destinationStation", model: "Station" }
       ]
-    }).populate("bus");
+    }).populate("bus").populate("driver");
     if (!trip) {
       throw new Error("Trip not found");
     }
@@ -108,7 +108,8 @@ export const tripService = {
       runValidators: true,
     })
       .populate("route")
-      .populate("bus");
+      .populate("bus")
+      .populate("driver");
 
     if (!trip) {
       throw new Error("Trip not found");

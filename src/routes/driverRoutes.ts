@@ -29,13 +29,9 @@ const driverRoutes = express.Router();
  *                 type: string
  *               licenseNumber:
  *                 type: string
- *               operator:
- *                 type: string
- *                 description: ID của operator (bắt buộc)
  *             required:
  *               - fullName
  *               - licenseNumber
- *               - operator
  *     responses:
  *       201:
  *         description: Driver được tạo thành công
@@ -71,8 +67,6 @@ driverRoutes.post("/", createDriver);
  *                   licenseNumber:
  *                     type: string
  *                   status:
- *                     type: string
- *                   operator:
  *                     type: string
  *                   createdAt:
  *                     type: string
@@ -114,8 +108,6 @@ driverRoutes.get("/", getAllDrivers);
  *               status:
  *                 type: string
  *                 enum: [active, inactive, suspended]
- *               operator:
- *                 type: string
  *     responses:
  *       200:
  *         description: Cập nhật driver thành công
