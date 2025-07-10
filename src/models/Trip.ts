@@ -5,6 +5,7 @@ const tripSchema = new Schema<ITrip>(
   {
     route: { type: Schema.Types.ObjectId, ref: "Route", required: true },
     bus: { type: Schema.Types.ObjectId, ref: "Bus", required: true },
+    driver: { type: Schema.Types.ObjectId, ref: "Driver", required: true },
     tripCode: { type: String, unique: true },
     departureDate: { type: Date, required: true },
     departureTime: { type: String, required: true }, // HH:mm format

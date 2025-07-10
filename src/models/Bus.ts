@@ -3,7 +3,6 @@ import { IBus } from "../interfaces/IBus";
 
 const busSchema = new Schema<IBus>(
   {
-    operator: { type: Schema.Types.ObjectId, ref: "BusOperator", required: true },
     licensePlate: { type: String, required: true, unique: true },
     busType: { 
       type: String, 
@@ -16,6 +15,7 @@ const busSchema = new Schema<IBus>(
       enum: ["active", "maintenance", "inactive"], 
       default: "active" 
     },
+    image: { type: String }
   },
   { timestamps: true }
 );

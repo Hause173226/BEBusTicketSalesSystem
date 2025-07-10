@@ -84,6 +84,12 @@ export const tripService = {
     endTime: string,
     intervalHours: number = 2
   ) => {
+    // Lấy thông tin route để lấy estimatedDuration
+    const route = await Route.findById(tripData.route);
+    if (!route) throw new Error("Route not found");
+    if (typeof route.estimatedDuration !== "number")
+      throw new Error("Route missing estimatedDuration");
+
     const [startHour, startMinute] = startTime.split(":").map(Number);
     const [endHour, endMinute] = endTime.split(":").map(Number);
 
@@ -101,14 +107,14 @@ export const tripService = {
       // Sinh tripCode: TRIP + 4 số random
       const tripCode = `TRIP${Math.floor(1000 + Math.random() * 9000)}`;
 
-      // arrivalTime = departureTime + intervalHours
-      let arrivalHour = currentHour + intervalHours;
-      let arrivalMinute = currentMinute;
-      if (arrivalHour >= 24) arrivalHour -= 24; // Đảm bảo không vượt quá 24h
-
-      const arrivalTime = `${arrivalHour
+      // arrivalTime = departureTime + estimatedDuration
+      const totalMinutes =
+        currentHour * 60 + currentMinute + route.estimatedDuration;
+      const arrHour = Math.floor((totalMinutes % 1440) / 60);
+      const arrMinute = totalMinutes % 60;
+      const arrivalTime = `${arrHour.toString().padStart(2, "0")}:${arrMinute
         .toString()
-        .padStart(2, "0")}:${arrivalMinute.toString().padStart(2, "0")}`;
+        .padStart(2, "0")}`;
 
       const newTrip = await Trip.create({
         ...tripData,
@@ -126,13 +132,31 @@ export const tripService = {
 
   // Get all trips with optional population of related fields
   getAllTrips: async () => {
-    const trips = await Trip.find().populate("route").populate("bus");
+    const trips = await Trip.find()
+      .populate({
+        path: "route",
+        populate: [
+          { path: "originStation", model: "Station" },
+          { path: "destinationStation", model: "Station" },
+        ],
+      })
+      .populate("bus")
+      .populate("driver");
     return trips;
   },
 
   // Get a single trip by ID
   getTripById: async (tripId: string) => {
-    const trip = await Trip.findById(tripId).populate("route").populate("bus");
+    const trip = await Trip.findById(tripId)
+      .populate({
+        path: "route",
+        populate: [
+          { path: "originStation", model: "Station" },
+          { path: "destinationStation", model: "Station" },
+        ],
+      })
+      .populate("bus")
+      .populate("driver");
     if (!trip) {
       throw new Error("Trip not found");
     }
@@ -146,7 +170,8 @@ export const tripService = {
       runValidators: true,
     })
       .populate("route")
-      .populate("bus");
+      .populate("bus")
+      .populate("driver");
 
     if (!trip) {
       throw new Error("Trip not found");

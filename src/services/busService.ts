@@ -9,7 +9,7 @@ export const busService = {
 
   // Lấy tất cả bus
   getAllBuses: async () => {
-    const buses = await Bus.find().populate("operator").lean();
+    const buses = await Bus.find().lean();
     return buses;
   },
 

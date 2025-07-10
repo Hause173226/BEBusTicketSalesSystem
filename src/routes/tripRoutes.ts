@@ -30,6 +30,9 @@ const tripRoutes = express.Router();
  *               bus:
  *                 type: string
  *                 description: ID của xe
+ *               driver:
+ *                 type: string
+ *                 description: ID của tài xế
  *               tripCode:
  *                 type: string
  *               departureDate:
@@ -53,6 +56,7 @@ const tripRoutes = express.Router();
  *             required:
  *               - route
  *               - bus
+ *               - driver
  *               - departureDate
  *               - departureTime
  *               - basePrice
@@ -152,6 +156,8 @@ tripRoutes.post("/multiple", createMultipleTrips);
  *                   route:
  *                     type: object
  *                   bus:
+ *                     type: object
+ *                   driver:
  *                     type: object
  *                   tripCode:
  *                     type: string
@@ -261,6 +267,8 @@ tripRoutes.get("/:id", getTripById);
  *               route:
  *                 type: string
  *               bus:
+ *                 type: string
+ *               driver:
  *                 type: string
  *               departureDate:
  *                 type: string
