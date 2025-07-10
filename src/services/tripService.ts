@@ -41,6 +41,10 @@ export const tripService = {
       );
     }
 
+    if (typeof route.estimatedDuration !== "number") {
+      throw new Error("Route missing estimatedDuration");
+    }
+
     // Kiểm tra bus có đang được sử dụng trong cùng thời gian không
     if (tripData.departureDate && tripData.departureTime) {
       const existingTrip = await Trip.findOne({
@@ -57,8 +61,20 @@ export const tripService = {
       }
     }
 
+    // Tính arrivalTime
+    const [depHour, depMinute] = tripData.departureTime!.split(":").map(Number);
+    const totalMinutes = depHour * 60 + depMinute + route.estimatedDuration;
+    const arrHour = Math.floor((totalMinutes % 1440) / 60);
+    const arrMinute = totalMinutes % 60;
+    const arrivalTime = `${arrHour.toString().padStart(2, "0")}:${arrMinute
+      .toString()
+      .padStart(2, "0")}`;
+
     // Tạo trip nếu tất cả kiểm tra đều pass
-    const trip = await Trip.create(tripData);
+    const trip = await Trip.create({
+      ...tripData,
+      arrivalTime,
+    });
 
     // Tự động tạo SeatBooking cho trip mới
     try {
@@ -237,6 +253,29 @@ export const tripService = {
         ],
       })
       .populate("bus");
+
+    return trips;
+  },
+
+  getTripsbyRouteId: async (routeId: string) => {
+    // Kiểm tra route có tồn tại không
+    const route = await Route.findById(routeId);
+    if (!route) {
+      throw new Error("Route not found");
+    }
+
+    // Lấy tất cả trip thuộc route này
+    const trips = await Trip.find({ route: routeId })
+      .populate({
+        path: "route",
+        populate: [
+          { path: "originStation", model: "Station" },
+          { path: "destinationStation", model: "Station" },
+        ],
+      })
+      .populate("bus")
+      .populate("driver")
+      .sort({ departureDate: 1, departureTime: 1 }); // Sắp xếp theo ngày và giờ khởi hành
 
     return trips;
   },

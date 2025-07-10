@@ -7,6 +7,7 @@ import {
   deleteTrip,
   searchTrips,
   createMultipleTrips,
+  getTripsbyRouteId,
 } from "../controllers/tripController";
 
 const tripRoutes = express.Router();
@@ -311,5 +312,28 @@ tripRoutes.put("/:id", updateTrip);
  *         description: Lỗi server
  */
 tripRoutes.delete("/:id", deleteTrip);
+
+/**
+ * @swagger
+ * /api/trips/route/{routeId}:
+ *   get:
+ *     summary: Lấy danh sách chuyến xe theo ID tuyến đường
+ *     tags: [Trips]
+ *     parameters:
+ *       - in: path
+ *         name: routeId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID của tuyến đường
+ *     responses:
+ *       200:
+ *         description: Danh sách chuyến xe theo tuyến đường
+ *       400:
+ *         description: Thiếu thông tin ID tuyến đường
+ *       404:
+ *         description: Không tìm thấy tuyến đường hoặc chuyến xe
+ */
+tripRoutes.get("/route/:routeId", getTripsbyRouteId);
 
 export default tripRoutes;

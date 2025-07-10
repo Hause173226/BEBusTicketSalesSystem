@@ -50,19 +50,7 @@ export const bookingService = {
         throw new Error("Bus information not found for this trip");
       }
 
-      // BƯỚC 3: Tự động init seats nếu chưa có
-      try {
-        await SeatBookingService.initSeatsForTrip(
-          trip.toString(),
-          tripData.bus._id.toString()
-        );
-        console.log(`Seats initialized for trip: ${trip}`);
-      } catch (initError: any) {
-        // Nếu đã init rồi thì skip
-        console.log("Seats already initialized or error:", initError.message);
-      }
-
-      // BƯỚC 4: Kiểm tra và select ghế (10 phút lock)
+      // BƯỚC 3: Kiểm tra và select ghế (10 phút lock)
       console.log(
         `Selecting seats: ${seatNumbers.join(", ")} for trip: ${trip}`
       );
@@ -72,7 +60,7 @@ export const bookingService = {
         10 // Lock 10 phút
       );
 
-      // BƯỚC 5: Tạo booking code và prepare data
+      // BƯỚC 4: Tạo booking code và prepare data
       const randomNumber = Math.floor(10000 + Math.random() * 90000);
       const bookingCode = `B${randomNumber}`;
 
@@ -85,11 +73,11 @@ export const bookingService = {
         updatedAt: new Date(),
       };
 
-      // BƯỚC 6: Tạo booking trong database
+      // BƯỚC 5: Tạo booking trong database
       console.log(`Creating booking with code: ${bookingCode}`);
       const booking = await Booking.create(bookingToCreate);
 
-      // BƯỚC 7: Populate thông tin chi tiết để trả về
+      // BƯỚC 6: Populate thông tin chi tiết để trả về
       const populatedBooking = await Booking.findById(booking._id)
         .populate({
           path: "customer",
@@ -122,6 +110,7 @@ export const bookingService = {
       };
     } catch (error: any) {
       console.error("Booking creation failed:", error.message);
+      throw new Error(`Booking creation failed: ${error.message}`);
     }
   },
 
@@ -150,6 +139,7 @@ export const bookingService = {
       .populate("trip")
       .populate("pickupStation")
       .populate("dropoffStation")
+      .sort({ createdAt: -1 })
       .lean();
     return bookings;
   },
