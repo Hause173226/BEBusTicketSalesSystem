@@ -16,6 +16,7 @@ const customerSchema = new Schema<IUser>(
     otpCode: { type: String },
     otpExpires: { type: Date },
     refreshToken: { type: String }, // Added for JWT refresh token
+    avatar: { type: String },
   },
   { timestamps: true }
 );
