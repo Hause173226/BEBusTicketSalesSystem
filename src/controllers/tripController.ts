@@ -109,3 +109,31 @@ export const searchTrips = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+export const getTripsbyRouteId = async (req: Request, res: Response) => {
+  try {
+    const { routeId } = req.params;
+
+    if (!routeId) {
+      res.status(400).json({
+        success: false,
+        message: "Route ID is required",
+      });
+      return;
+    }
+
+    const trips = await tripService.getTripsbyRouteId(routeId);
+
+    res.status(200).json({
+      success: true,
+      count: trips.length,
+      data: trips,
+    });
+  } catch (error: any) {
+    console.error("Failed to get trips by route ID:", error.message);
+    res.status(error.message === "Route not found" ? 404 : 500).json({
+      success: false,
+      message: error.message || "Failed to get trips by route ID",
+    });
+  }
+};

@@ -1,10 +1,21 @@
+import { Bus } from "../models/Bus";
 import { Seat } from "../models/Seat";
 
 // Tạo danh sách ghế cho 1 bus (A1-A20, B1-B20)
 export async function generateSeatsForBus(busId: string) {
+  // Lấy thông tin bus để biết seatCount
+  const bus = await Bus.findById(busId);
+  if (!bus) throw new Error("Bus not found");
+
+  const seatCount = bus.seatCount || 40; // Mặc định là 40 nếu không có seatCount
+
+  // Tính toán số hàng và số ghế mỗi hàng
+  const rows = ["A", "B"];
+  const seatsPerRow = Math.ceil(seatCount / rows.length);
+
   const seats = [];
-  for (let row of ["A", "B"]) {
-    for (let num = 1; num <= 20; num++) {
+  for (let row of rows) {
+    for (let num = 1; num <= seatsPerRow && seats.length < seatCount; num++) {
       seats.push({
         bus: busId,
         seatNumber: `${row}${num}`,
