@@ -2,11 +2,79 @@ import { Trip } from "../models/Trip";
 import { ITrip } from "../interfaces/ITrip";
 import { Station } from "../models/Station";
 import { Route } from "../models/Route";
+import { Bus } from "../models/Bus";
+import { SeatBookingService } from "./seatBookingService";
 
 export const tripService = {
   // Create a new trip
   createTrip: async (tripData: Partial<ITrip>) => {
+    // Validate required fields
+    if (!tripData.bus) {
+      throw new Error("Bus ID is required");
+    }
+
+    if (!tripData.route) {
+      throw new Error("Route ID is required");
+    }
+
+    // Kiểm tra bus có tồn tại và có hoạt động không
+    const bus = await Bus.findById(tripData.bus);
+    if (!bus) {
+      throw new Error("Bus not found");
+    }
+
+    if (bus.status !== "active") {
+      throw new Error(
+        `Cannot create trip. Bus ${bus.licensePlate} is not active. Current status: ${bus.status}`
+      );
+    }
+
+    // Kiểm tra route có tồn tại và có hoạt động không
+    const route = await Route.findById(tripData.route);
+    if (!route) {
+      throw new Error("Route not found");
+    }
+
+    if (route.status !== "active") {
+      throw new Error(
+        `Cannot create trip. Route ${route.name} is not active. Current status: ${route.status}`
+      );
+    }
+
+    // Kiểm tra bus có đang được sử dụng trong cùng thời gian không
+    if (tripData.departureDate && tripData.departureTime) {
+      const existingTrip = await Trip.findOne({
+        bus: tripData.bus,
+        departureDate: tripData.departureDate,
+        departureTime: tripData.departureTime,
+        status: { $in: ["scheduled", "in_progress"] },
+      });
+
+      if (existingTrip) {
+        throw new Error(
+          `Bus ${bus.licensePlate} is already scheduled for another trip at ${tripData.departureTime} on ${tripData.departureDate}`
+        );
+      }
+    }
+
+    // Tạo trip nếu tất cả kiểm tra đều pass
     const trip = await Trip.create(tripData);
+
+    // Tự động tạo SeatBooking cho trip mới
+    try {
+      await SeatBookingService.initSeatsForTrip(
+        trip._id.toString(),
+        tripData.bus.toString()
+      );
+      console.log(`SeatBooking initialized for trip: ${trip._id}`);
+    } catch (seatError: any) {
+      console.error(
+        `Failed to initialize seats for trip ${trip._id}:`,
+        seatError.message
+      );
+      // Không throw error để không ảnh hưởng đến việc tạo trip
+    }
+
     return trip;
   },
 

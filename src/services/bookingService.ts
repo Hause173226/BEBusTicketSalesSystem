@@ -1,54 +1,127 @@
 import { Booking } from "../models/Booking";
 import { IBooking } from "../interfaces/IBooking";
 import { SeatBookingService } from "./seatBookingService";
+import { Trip } from "../models/Trip";
 
 export const bookingService = {
   createBooking: async (bookingData: Partial<IBooking>) => {
     try {
-      // Kiểm tra dữ liệu đầu vào
-      const { trip, seatNumbers } = bookingData;
-      if (
-        !trip ||
-        !seatNumbers ||
-        !Array.isArray(seatNumbers) ||
-        seatNumbers.length === 0
-      ) {
-        throw new Error("Trip ID and seat numbers are required");
+      // BƯỚC 1: Validate input data
+      const {
+        trip,
+        seatNumbers,
+        customer,
+        pickupStation,
+        dropoffStation,
+        totalAmount,
+      } = bookingData;
+
+      if (!trip) {
+        throw new Error("Trip ID is required");
       }
 
-      // 1. Kiểm tra ghế có đang được selected (locked) không
-      const selectedSeats = await SeatBookingService.getSelectedSeats(
-        trip.toString(),
-        seatNumbers
-      );
-      if (selectedSeats.length !== seatNumbers.length) {
-        throw new Error(
-          "Some seats are not properly selected or have expired. Please reselect your seats."
+      if (!seatNumbers || seatNumbers.length === 0) {
+        throw new Error("At least one seat must be selected");
+      }
+
+      if (!customer) {
+        throw new Error("Customer ID is required");
+      }
+
+      if (!pickupStation) {
+        throw new Error("Pickup station is required");
+      }
+
+      if (!dropoffStation) {
+        throw new Error("Dropoff station is required");
+      }
+
+      if (!totalAmount || totalAmount <= 0) {
+        throw new Error("Total amount must be greater than 0");
+      }
+
+      // BƯỚC 2: Kiểm tra trip tồn tại và lấy bus info
+      const tripData = await Trip.findById(trip).populate("bus");
+      if (!tripData) {
+        throw new Error("Trip not found");
+      }
+
+      if (!tripData.bus) {
+        throw new Error("Bus information not found for this trip");
+      }
+
+      // BƯỚC 3: Tự động init seats nếu chưa có
+      try {
+        await SeatBookingService.initSeatsForTrip(
+          trip.toString(),
+          tripData.bus._id.toString()
         );
+        console.log(`Seats initialized for trip: ${trip}`);
+      } catch (initError: any) {
+        // Nếu đã init rồi thì skip
+        console.log("Seats already initialized or error:", initError.message);
       }
 
-      // 2. Tạo bookingCode: B + 5 số ngẫu nhiên
+      // BƯỚC 4: Kiểm tra và select ghế (10 phút lock)
+      console.log(
+        `Selecting seats: ${seatNumbers.join(", ")} for trip: ${trip}`
+      );
+      await SeatBookingService.selectSeats(
+        trip.toString(),
+        seatNumbers,
+        10 // Lock 10 phút
+      );
+
+      // BƯỚC 5: Tạo booking code và prepare data
       const randomNumber = Math.floor(10000 + Math.random() * 90000);
-      bookingData.bookingCode = `B${randomNumber}`;
+      const bookingCode = `B${randomNumber}`;
 
-      // 3. Tạo booking
-      const booking = await Booking.create(bookingData);
+      const bookingToCreate: Partial<IBooking> = {
+        ...bookingData,
+        bookingCode: bookingCode,
+        bookingStatus: "pending",
+        paymentStatus: "unpaid",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
 
-      // 4. Xác nhận ghế (chuyển từ 'selected' -> 'booked')
-      // await SeatBookingService.confirmSeatBooking(
-      //   trip.toString(),
-      //   seatNumbers,
-      //   booking._id.toString()
-      // );
+      // BƯỚC 6: Tạo booking trong database
+      console.log(`Creating booking with code: ${bookingCode}`);
+      const booking = await Booking.create(bookingToCreate);
 
-      // 5. Trả về booking đã tạo
+      // BƯỚC 7: Populate thông tin chi tiết để trả về
+      const populatedBooking = await Booking.findById(booking._id)
+        .populate({
+          path: "customer",
+          select: "fullName email phone",
+        })
+        .populate({
+          path: "trip",
+          select: "departureDate departureTime arrivalTime basePrice",
+          populate: {
+            path: "route",
+            select: "name originStation destinationStation",
+            populate: [
+              { path: "originStation", select: "name address" },
+              { path: "destinationStation", select: "name address" },
+            ],
+          },
+        })
+        .populate("pickupStation", "name address")
+        .populate("dropoffStation", "name address");
+
+      console.log(`Booking created successfully: ${bookingCode}`);
+
       return {
         success: true,
-        data: booking,
-        message: "Booking created successfully",
+        data: populatedBooking,
+        message:
+          "Booking created and seats locked for 10 minutes. Please proceed to payment.",
+        bookingCode: bookingCode,
+        lockedUntil: new Date(Date.now() + 10 * 60 * 1000), // 10 phút từ bây giờ
       };
     } catch (error: any) {
-      throw new Error(`Booking creation failed: ${error.message}`);
+      console.error("Booking creation failed:", error.message);
     }
   },
 
