@@ -267,7 +267,8 @@ export const userService = {
       'citizenId', 
       'dateOfBirth', 
       'gender', 
-      'address'
+      'address',
+      'avatar'
     ];
     
     // Remove fields that are not allowed to be updated
