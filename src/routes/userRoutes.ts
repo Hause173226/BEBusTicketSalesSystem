@@ -17,6 +17,7 @@ import {
   getProfile,
 } from "../controllers/userController";
 import { authenticateJWT } from "../middlewares/authenticate";
+import uploadAvatar from "../middlewares/uploadAvatar";
 
 const userRoutes = express.Router();
 
@@ -488,14 +489,14 @@ const userRoutes = express.Router();
  *       500:
  *         description: Internal server error
  *   put:
- *     summary: Cập nhật thông tin profile của user hiện tại
+ *     summary: Cập nhật thông tin profile của user hiện tại (có thể upload ảnh avatar)
  *     tags: [User Profile]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -523,6 +524,10 @@ const userRoutes = express.Router();
  *               address:
  *                 type: string
  *                 description: Địa chỉ
+ *               avatar:
+ *                 type: string
+ *                 format: binary
+ *                 description: Ảnh đại diện (file ảnh)
  *     responses:
  *       200:
  *         description: Cập nhật profile thành công
@@ -549,6 +554,9 @@ const userRoutes = express.Router();
  *                   enum: [male, female, other]
  *                 address:
  *                   type: string
+ *                 avatar:
+ *                   type: string
+ *                   description: URL ảnh đại diện
  *                 role:
  *                   type: string
  *                   enum: [user, admin]
@@ -581,7 +589,7 @@ userRoutes.post("/signout", authenticateJWT, signOut);
 
 // Profile routes
 userRoutes.get("/profile", authenticateJWT, getProfile);
-userRoutes.put("/profile", authenticateJWT, updateProfile);
+userRoutes.put("/profile", authenticateJWT, uploadAvatar.single("avatar"), updateProfile);
 
 // Protected routes
 userRoutes.get("/", authenticateJWT, getAllUsers);

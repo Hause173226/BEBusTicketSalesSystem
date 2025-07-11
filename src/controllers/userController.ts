@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { userService } from "../services/userService";
+import { uploadImageToFirebase } from "../utils/firebaseUpload";
 
 export const signUp = async (req: Request, res: Response) => {
   try {
@@ -190,7 +191,17 @@ export const changePassword = async (req: Request, res: Response) => {
 export const updateProfile = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.userId; // Lấy từ JWT token
-    const updatedUser = await userService.updateProfile(userId, req.body);
+    let updateData = req.body;
+
+    // Nếu có file avatar thì upload lên Firebase
+    if (req.file) {
+      const file = req.file;
+      const fileName = `${userId}_${Date.now()}_${file.originalname}`;
+      const url = await uploadImageToFirebase(file.buffer, fileName, file.mimetype);
+      updateData = { ...updateData, avatar: url };
+    }
+
+    const updatedUser = await userService.updateProfile(userId, updateData);
     res.status(200).json(updatedUser);
   } catch (err) {
     if (err instanceof Error) {
