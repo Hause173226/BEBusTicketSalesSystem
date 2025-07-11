@@ -1,3 +1,4 @@
+
 import mongoose, { Schema } from "mongoose";
 import { IUser } from "../interfaces/IUser";
 

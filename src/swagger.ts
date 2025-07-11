@@ -20,6 +20,10 @@ const options = {
       {
         name: "Users",
         description: "User management endpoints (Admin only)"
+      },
+      {
+        name: "Upload",
+        description: "Image upload and management endpoints"
       }
     ],
     components: {
@@ -37,7 +41,7 @@ const options = {
       },
     ],
   },
-  apis: ["./src/routes/*.ts", "./src/controllers/*.ts"], // Đường dẫn tới các file có comment swagger
+  apis: ["src/routes/*.ts", "src/controllers/*.ts"], // Đường dẫn tới các file có comment swagger
 };
 
 export const swaggerSpec = swaggerJSDoc(options);

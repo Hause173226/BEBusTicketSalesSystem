@@ -15,7 +15,7 @@ const busSchema = new Schema<IBus>(
       enum: ["active", "maintenance", "inactive"], 
       default: "active" 
     },
-    image: { type: String }
+    images: [{ type: String }] // Array of image URLs
   },
   { timestamps: true }
 );

@@ -6,6 +6,7 @@ export interface IBus {
   seatCount: number;
   status?: "active" | "maintenance" | "inactive";
   image?: string;
+  images?: string[]; // Array of image URLs
   createdAt?: Date;
   updatedAt?: Date;
 }
