@@ -21,6 +21,7 @@ import seatRoutes from "./routes/seatRoutes";
 import uploadRoutes from "./routes/uploadRoutes";
 import path from "path";
 
+
 const app = express();
 
 app.use(
