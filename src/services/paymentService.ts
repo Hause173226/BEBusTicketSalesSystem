@@ -4,6 +4,7 @@ import querystring from "qs";
 import { Request } from "express";
 import { Booking } from "../models/Booking";
 import { PaymentHistory } from "../models/Payment";
+import { Trip } from "../models/Trip"; // THÊM import này
 import { VNPayConfig } from "../config/vnpay";
 import { SeatBookingService } from "./seatBookingService";
 
@@ -165,7 +166,15 @@ export const handleVNPayReturn = async (vnp_Params: any) => {
             );
           } catch (seatError) {
             console.error("Error confirming seats:", seatError);
-            // Log error nhưng không throw để không ảnh hưởng payment flow
+          }
+
+          // Giảm số ghế còn lại trong Trip
+          try {
+            await Trip.findByIdAndUpdate(booking.trip, {
+              $inc: { availableSeats: -booking.seatNumbers.length },
+            });
+          } catch (tripError) {
+            console.error("Error updating available seats:", tripError);
           }
         }
 
@@ -256,12 +265,20 @@ export const handleVNPayCallback = async (vnp_Params: any) => {
                   booking.seatNumbers,
                   booking._id.toString()
                 );
-                console.log(
-                  "[Callback] Seats confirmed for booking:",
-                  booking.bookingCode
-                );
               } catch (seatError) {
                 console.error("[Callback] Error confirming seats:", seatError);
+              }
+
+              // Giảm số ghế còn lại trong Trip
+              try {
+                await Trip.findByIdAndUpdate(booking.trip, {
+                  $inc: { availableSeats: -booking.seatNumbers.length },
+                });
+              } catch (tripError) {
+                console.error(
+                  "[Callback] Error updating available seats:",
+                  tripError
+                );
               }
             }
 

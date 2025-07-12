@@ -74,6 +74,7 @@ export const tripService = {
     const trip = await Trip.create({
       ...tripData,
       arrivalTime,
+      availableSeats: bus.seatCount || 40,
     });
 
     // Tự động tạo SeatBooking cho trip mới
@@ -82,7 +83,6 @@ export const tripService = {
         trip._id.toString(),
         tripData.bus.toString()
       );
-      console.log(`SeatBooking initialized for trip: ${trip._id}`);
     } catch (seatError: any) {
       console.error(
         `Failed to initialize seats for trip ${trip._id}:`,

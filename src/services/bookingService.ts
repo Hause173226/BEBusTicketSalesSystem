@@ -51,9 +51,6 @@ export const bookingService = {
       }
 
       // BƯỚC 3: Kiểm tra và select ghế (10 phút lock)
-      console.log(
-        `Selecting seats: ${seatNumbers.join(", ")} for trip: ${trip}`
-      );
       await SeatBookingService.selectSeats(
         trip.toString(),
         seatNumbers,
@@ -74,7 +71,6 @@ export const bookingService = {
       };
 
       // BƯỚC 5: Tạo booking trong database
-      console.log(`Creating booking with code: ${bookingCode}`);
       const booking = await Booking.create(bookingToCreate);
 
       // BƯỚC 6: Populate thông tin chi tiết để trả về
@@ -97,8 +93,6 @@ export const bookingService = {
         })
         .populate("pickupStation", "name address")
         .populate("dropoffStation", "name address");
-
-      console.log(`Booking created successfully: ${bookingCode}`);
 
       return {
         success: true,
