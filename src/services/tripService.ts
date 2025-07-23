@@ -4,65 +4,96 @@ import { Station } from "../models/Station";
 import { Route } from "../models/Route";
 import { Bus } from "../models/Bus";
 import { SeatBookingService } from "./seatBookingService";
+import { Driver } from "../models/Driver";
 
 export const tripService = {
   // Create a new trip
   createTrip: async (tripData: Partial<ITrip>) => {
     // Validate required fields
-    if (!tripData.bus) {
-      throw new Error("Bus ID is required");
-    }
+    if (!tripData.bus) throw new Error("Bus ID is required");
+    if (!tripData.route) throw new Error("Route ID is required");
+    if (!tripData.driver) throw new Error("Driver ID is required");
+    if (!tripData.departureDate || !tripData.departureTime)
+      throw new Error("Departure date and time are required");
 
-    if (!tripData.route) {
-      throw new Error("Route ID is required");
-    }
-
-    // Kiểm tra bus có tồn tại và có hoạt động không
+    // Kiểm tra bus, route, driver có tồn tại và active
     const bus = await Bus.findById(tripData.bus);
-    if (!bus) {
-      throw new Error("Bus not found");
-    }
+    if (!bus) throw new Error("Bus not found");
+    if (bus.status !== "active")
+      throw new Error(`Bus ${bus.licensePlate} is not active.`);
 
-    if (bus.status !== "active") {
-      throw new Error(
-        `Cannot create trip. Bus ${bus.licensePlate} is not active. Current status: ${bus.status}`
-      );
-    }
-
-    // Kiểm tra route có tồn tại và có hoạt động không
     const route = await Route.findById(tripData.route);
-    if (!route) {
-      throw new Error("Route not found");
-    }
-
-    if (route.status !== "active") {
-      throw new Error(
-        `Cannot create trip. Route ${route.name} is not active. Current status: ${route.status}`
-      );
-    }
-
-    if (typeof route.estimatedDuration !== "number") {
+    if (!route) throw new Error("Route not found");
+    if (route.status !== "active")
+      throw new Error(`Route ${route.name} is not active.`);
+    if (typeof route.estimatedDuration !== "number")
       throw new Error("Route missing estimatedDuration");
+
+    const driver = await Driver.findById(tripData.driver);
+    if (!driver) throw new Error("Driver not found");
+    if (driver.status !== "active")
+      throw new Error(`Driver ${driver.fullName} is not active.`);
+
+    // Chuẩn hóa departureDate về kiểu Date (dù FE gửi kiểu nào)
+    let tripDate: Date;
+    if (typeof tripData.departureDate === "string") {
+      tripDate = new Date(tripData.departureDate);
+    } else {
+      tripDate = tripData.departureDate as Date;
     }
 
-    // Kiểm tra bus có đang được sử dụng trong cùng thời gian không
-    if (tripData.departureDate && tripData.departureTime) {
-      const existingTrip = await Trip.findOne({
-        bus: tripData.bus,
-        departureDate: tripData.departureDate,
-        departureTime: tripData.departureTime,
-        status: { $in: ["scheduled", "in_progress"] },
-      });
+    // Tạo đối tượng thời gian khởi hành đầy đủ
+    const [depHour, depMinute] = tripData.departureTime.split(":").map(Number);
+    tripDate.setHours(depHour, depMinute, 0, 0);
+    const tripDateTime = tripDate;
 
-      if (existingTrip) {
+    // Kiểm tra không tạo chuyến trong quá khứ
+    const now = new Date();
+    if (tripDateTime <= now) {
+      throw new Error("Cannot create trip in the past.");
+    }
+
+    // Tính thời gian kết thúc chuyến mới
+    const newStart = tripDateTime;
+    const newEnd = new Date(
+      newStart.getTime() + route.estimatedDuration * 60000
+    );
+
+    // Kiểm tra trùng lịch xe/tài xế
+    const conflictTrips = await Trip.find({
+      $or: [{ bus: tripData.bus }, { driver: tripData.driver }],
+      status: { $in: ["scheduled", "in_progress"] },
+    }).populate("route");
+
+    for (const trip of conflictTrips) {
+      // Chuẩn hóa departureDate của trip cũ
+      let oldTripDate: Date;
+      if (typeof trip.departureDate === "string") {
+        oldTripDate = new Date(trip.departureDate);
+      } else {
+        oldTripDate = trip.departureDate as Date;
+      }
+      const [oldDepHour, oldDepMinute] = trip.departureTime
+        .split(":")
+        .map(Number);
+      oldTripDate.setHours(oldDepHour, oldDepMinute, 0, 0);
+      const tripStart = oldTripDate;
+
+      // Lấy estimatedDuration từ route đã populate
+      const routeData = trip.route as any;
+      const tripEnd = new Date(
+        tripStart.getTime() + (routeData.estimatedDuration || 0) * 60000
+      );
+
+      // Nếu thời gian mới giao với thời gian cũ
+      if (newStart < tripEnd && newEnd > tripStart) {
         throw new Error(
-          `Bus ${bus.licensePlate} is already scheduled for another trip at ${tripData.departureTime} on ${tripData.departureDate}`
+          "Bus or driver is already scheduled for another trip during this time."
         );
       }
     }
 
-    // Tính arrivalTime
-    const [depHour, depMinute] = tripData.departureTime!.split(":").map(Number);
+    // Tính arrivalTime tự động từ departureTime và estimatedDuration
     const totalMinutes = depHour * 60 + depMinute + route.estimatedDuration;
     const arrHour = Math.floor((totalMinutes % 1440) / 60);
     const arrMinute = totalMinutes % 60;
@@ -70,14 +101,15 @@ export const tripService = {
       .toString()
       .padStart(2, "0")}`;
 
-    // Tạo trip nếu tất cả kiểm tra đều pass
+    // Tạo trip
     const trip = await Trip.create({
       ...tripData,
-      arrivalTime,
+      departureDate: tripDateTime, // Lưu lại kiểu Date chuẩn
+      arrivalTime, // Tính tự động
       availableSeats: bus.seatCount || 40,
     });
 
-    // Tự động tạo SeatBooking cho trip mới
+    // Tạo SeatBooking cho trip mới
     try {
       await SeatBookingService.initSeatsForTrip(
         trip._id.toString(),
@@ -88,7 +120,6 @@ export const tripService = {
         `Failed to initialize seats for trip ${trip._id}:`,
         seatError.message
       );
-      // Không throw error để không ảnh hưởng đến việc tạo trip
     }
 
     return trip;
