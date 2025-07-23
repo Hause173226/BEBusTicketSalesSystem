@@ -5,7 +5,6 @@ import { Route } from "../models/Route";
 import { Bus } from "../models/Bus";
 import { SeatBookingService } from "./seatBookingService";
 import { Driver } from "../models/Driver";
-import { Driver } from "../models/Driver";
 
 export const tripService = {
   // Create a new trip
