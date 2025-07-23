@@ -53,10 +53,19 @@ export const routeService = {
 
   // Delete route
   deleteRoute: async (routeId: string) => {
-    const route = await Route.findByIdAndDelete(routeId);
+    const route = await Route.findById(routeId);
     if (!route) {
       throw new Error("Route not found");
     }
+    if (route.status !== "inactive") {
+      throw new Error("Only routes with status 'inactive' can be deleted");
+    }
+    // Kiểm tra còn trip nào liên kết không
+    const tripCount = await require("../models/Trip").Trip.countDocuments({ route: routeId });
+    if (tripCount > 0) {
+      throw new Error("Cannot delete route: there are trips linked to this route");
+    }
+    await Route.findByIdAndDelete(routeId);
     return route;
   },
 

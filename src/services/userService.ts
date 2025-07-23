@@ -203,7 +203,7 @@ export const userService = {
   },
 
   getAllUsers: async () => {
-    const users = await Customer.find().lean();
+    const users = await Customer.find({ isActive: true }).lean();
     return users;
   },
 
@@ -219,10 +219,12 @@ export const userService = {
   },
 
   deleteUser: async (userId: string) => {
-    const user = await Customer.findByIdAndDelete(userId);
+    const user = await Customer.findById(userId);
     if (!user) {
       throw new Error("User not found");
     }
+    user.isActive = false;
+    await user.save();
     return user;
   },
 

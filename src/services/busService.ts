@@ -50,10 +50,19 @@ export const busService = {
 
   // Xóa bus
   deleteBus: async (busId: string) => {
-    const bus = await Bus.findByIdAndDelete(busId);
+    const bus = await Bus.findById(busId);
     if (!bus) {
       throw new Error("Bus not found");
     }
+    if (bus.status !== "inactive") {
+      throw new Error("Only buses with status 'inactive' can be deleted");
+    }
+    // Kiểm tra còn trip nào liên kết không
+    const tripCount = await require("../models/Trip").Trip.countDocuments({ bus: busId });
+    if (tripCount > 0) {
+      throw new Error("Cannot delete bus: there are trips linked to this bus");
+    }
+    await Bus.findByIdAndDelete(busId);
     return bus;
   },
 };

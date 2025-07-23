@@ -4,6 +4,7 @@ import { Station } from "../models/Station";
 import { Route } from "../models/Route";
 import { Bus } from "../models/Bus";
 import { SeatBookingService } from "./seatBookingService";
+import { Driver } from "../models/Driver";
 
 export const tripService = {
   // Create a new trip
@@ -45,18 +46,34 @@ export const tripService = {
       throw new Error("Route missing estimatedDuration");
     }
 
-    // Kiểm tra bus có đang được sử dụng trong cùng thời gian không
+    // Kiểm tra driver có được truyền vào không
+    if (!tripData.driver) {
+      throw new Error("Driver ID is required");
+    }
+
+    // Kiểm tra driver có tồn tại và có hoạt động không
+    const driver = await Driver.findById(tripData.driver);
+    if (!driver) {
+      throw new Error("Driver not found");
+    }
+    if (driver.status !== "active") {
+      throw new Error(
+        `Cannot create trip. Driver ${driver.fullName} is not active. Current status: ${driver.status}`
+      );
+    }
+
+    // Kiểm tra driver có đang được sử dụng trong cùng thời gian không
     if (tripData.departureDate && tripData.departureTime) {
-      const existingTrip = await Trip.findOne({
-        bus: tripData.bus,
+      const existingTripWithDriver = await Trip.findOne({
+        driver: tripData.driver,
         departureDate: tripData.departureDate,
         departureTime: tripData.departureTime,
         status: { $in: ["scheduled", "in_progress"] },
       });
 
-      if (existingTrip) {
+      if (existingTripWithDriver) {
         throw new Error(
-          `Bus ${bus.licensePlate} is already scheduled for another trip at ${tripData.departureTime} on ${tripData.departureDate}`
+          `Driver ${driver.fullName} is already scheduled for another trip at ${tripData.departureTime} on ${tripData.departureDate}`
         );
       }
     }
@@ -197,10 +214,14 @@ export const tripService = {
 
   // Delete a trip
   deleteTrip: async (tripId: string) => {
-    const trip = await Trip.findByIdAndDelete(tripId);
+    const trip = await Trip.findById(tripId);
     if (!trip) {
       throw new Error("Trip not found");
     }
+    if (trip.status !== "cancelled" && trip.status !== "completed") {
+      throw new Error("Only trips with status 'cancelled' or 'completed' can be deleted");
+    }
+    await Trip.findByIdAndDelete(tripId);
     return trip;
   },
 
@@ -278,5 +299,29 @@ export const tripService = {
       .sort({ departureDate: 1, departureTime: 1 }); // Sắp xếp theo ngày và giờ khởi hành
 
     return trips;
+  },
+
+  // Update trip status with strict flow
+  updateTripStatus: async (tripId: string, newStatus: string) => {
+    const trip = await Trip.findById(tripId);
+    if (!trip) {
+      throw new Error("Trip not found");
+    }
+    const currentStatus = trip.status as "scheduled" | "in_progress" | "completed" | "cancelled";
+    // Allowed transitions
+    const allowedTransitions: Record<"scheduled" | "in_progress" | "completed" | "cancelled", string[]> = {
+      scheduled: ["in_progress", "cancelled"],
+      in_progress: ["completed", "cancelled"],
+      completed: [],
+      cancelled: [],
+    };
+    if (!allowedTransitions[currentStatus].includes(newStatus)) {
+      throw new Error(
+        `Cannot change status from '${currentStatus}' to '${newStatus}'. Allowed: ${allowedTransitions[currentStatus].join(", ")}`
+      );
+    }
+    trip.status = newStatus as "scheduled" | "in_progress" | "completed" | "cancelled";
+    await trip.save();
+    return trip;
   },
 };
