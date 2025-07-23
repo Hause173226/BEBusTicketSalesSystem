@@ -49,7 +49,7 @@ export const bookingService = {
       if (!tripData.bus) {
         throw new Error("Bus information not found for this trip");
       }
-        if (tripData.status !== "scheduled") {
+      if (tripData.status !== "scheduled") {
         throw new Error(
           `Cannot book this trip. Trip status is "${tripData.status}". Only "scheduled" trips can be booked.`
         );

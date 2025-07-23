@@ -4,17 +4,28 @@ import { generateSeatsForBus } from "./seatService";
 export const busService = {
   // Tạo mới bus
   createBus: async (busData: any) => {
+    // Xác định số ghế mặc định theo loại xe
+    const defaultSeatCounts: Record<string, number> = {
+      standard: 40,
+      sleeper: 32,
+      limousine: 28,
+      vip: 20,
+    };
+
+    const seatCount =
+      busData.seatCount || defaultSeatCounts[busData.busType] || 40; // fallback nếu không xác định được loại xe
+
     const busDataWithDefaults = {
       ...busData,
-      status: busData.status || "active", // Mặc định là active nếu không có status
-      seatCount: busData.seatCount || 40, // Mặc định là 40 ghế nếu không có seatCount
+      status: busData.status || "active",
+      seatCount,
     };
+
     const bus = await Bus.create(busDataWithDefaults);
 
     // Tự động tạo ghế cho bus vừa tạo
     try {
-      await generateSeatsForBus(bus._id.toString());
-      console.log(`Successfully generated seats for bus ${bus._id}`);
+      await generateSeatsForBus(bus._id.toString(), seatCount); // truyền seatCount vào
     } catch (error: any) {
       console.error(`Error generating seats: ${error.message}`);
     }

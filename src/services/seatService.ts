@@ -2,14 +2,17 @@ import { Bus } from "../models/Bus";
 import { Seat } from "../models/Seat";
 
 // Tạo danh sách ghế cho 1 bus (A1-A20, B1-B20)
-export async function generateSeatsForBus(busId: string) {
-  // Lấy thông tin bus để biết seatCount
+export async function generateSeatsForBus(busId: string, seatCount: number) {
   const bus = await Bus.findById(busId);
   if (!bus) throw new Error("Bus not found");
 
-  const seatCount = bus.seatCount || 40; // Mặc định là 40 nếu không có seatCount
+  // Kiểm tra đã tạo ghế chưa
+  const existingSeats = await Seat.find({ bus: busId });
+  if (existingSeats.length > 0) {
+    throw new Error("Seats already exist for this bus");
+  }
 
-  // Tính toán số hàng và số ghế mỗi hàng
+  // Luôn chia đều cho 2 hàng A, B
   const rows = ["A", "B"];
   const seatsPerRow = Math.ceil(seatCount / rows.length);
 
@@ -23,14 +26,11 @@ export async function generateSeatsForBus(busId: string) {
     }
   }
 
-  // Kiểm tra đã tạo ghế chưa
-  const existingSeats = await Seat.find({ bus: busId });
-  if (existingSeats.length > 0) {
-    throw new Error("Seats already exist for this bus");
-  }
-
   await Seat.insertMany(seats);
-  return { message: "Seats created successfully", count: seats.length };
+  return {
+    message: `Seats created successfully for bus type ${bus.busType}`,
+    count: seats.length,
+  };
 }
 
 // Lấy danh sách ghế của bus (chỉ thông tin cơ bản)
