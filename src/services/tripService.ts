@@ -5,6 +5,7 @@ import { Route } from "../models/Route";
 import { Bus } from "../models/Bus";
 import { SeatBookingService } from "./seatBookingService";
 import { Driver } from "../models/Driver";
+import { Driver } from "../models/Driver";
 
 export const tripService = {
   // Create a new trip
@@ -228,10 +229,16 @@ export const tripService = {
 
   // Delete a trip
   deleteTrip: async (tripId: string) => {
-    const trip = await Trip.findByIdAndDelete(tripId);
+    const trip = await Trip.findById(tripId);
     if (!trip) {
       throw new Error("Trip not found");
     }
+    if (trip.status !== "cancelled" && trip.status !== "completed") {
+      throw new Error(
+        "Only trips with status 'cancelled' or 'completed' can be deleted"
+      );
+    }
+    await Trip.findByIdAndDelete(tripId);
     return trip;
   },
 
@@ -309,5 +316,42 @@ export const tripService = {
       .sort({ departureDate: 1, departureTime: 1 }); // Sắp xếp theo ngày và giờ khởi hành
 
     return trips;
+  },
+
+  // Update trip status with strict flow
+  updateTripStatus: async (tripId: string, newStatus: string) => {
+    const trip = await Trip.findById(tripId);
+    if (!trip) {
+      throw new Error("Trip not found");
+    }
+    const currentStatus = trip.status as
+      | "scheduled"
+      | "in_progress"
+      | "completed"
+      | "cancelled";
+    // Allowed transitions
+    const allowedTransitions: Record<
+      "scheduled" | "in_progress" | "completed" | "cancelled",
+      string[]
+    > = {
+      scheduled: ["in_progress", "cancelled"],
+      in_progress: ["completed", "cancelled"],
+      completed: [],
+      cancelled: [],
+    };
+    if (!allowedTransitions[currentStatus].includes(newStatus)) {
+      throw new Error(
+        `Cannot change status from '${currentStatus}' to '${newStatus}'. Allowed: ${allowedTransitions[
+          currentStatus
+        ].join(", ")}`
+      );
+    }
+    trip.status = newStatus as
+      | "scheduled"
+      | "in_progress"
+      | "completed"
+      | "cancelled";
+    await trip.save();
+    return trip;
   },
 };

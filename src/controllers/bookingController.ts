@@ -7,10 +7,15 @@ export const bookingController = {
       const result = await bookingService.createBooking(req.body);
       res.status(201).json(result);
     } catch (error: any) {
-      res.status(400).json({
-        success: false,
-        message: error.message,
-      });
+      if (error instanceof Error) {
+        if (error.message.includes("not found")) {
+          res.status(404).json({ success: false, message: "Không tìm thấy dữ liệu" });
+        } else {
+          res.status(400).json({ success: false, message: error.message });
+        }
+      } else {
+        res.status(500).json({ success: false, message: "Lỗi máy chủ nội bộ" });
+      }
     }
   },
 
@@ -24,7 +29,7 @@ export const bookingController = {
     } catch (error: any) {
       res.status(500).json({
         success: false,
-        message: error.message,
+        message: "Lỗi máy chủ nội bộ",
       });
     }
   },
@@ -36,7 +41,7 @@ export const bookingController = {
       if (!bookings || bookings.length === 0) {
         res.status(404).json({
           success: false,
-          message: "No bookings found for this user.",
+          message: "Không tìm thấy lịch sử đặt vé cho người dùng này.",
         });
         return;
       }
@@ -45,10 +50,14 @@ export const bookingController = {
         data: bookings,
       });
     } catch (error: any) {
-      res.status(500).json({
-        success: false,
-        message: error.message,
-      });
+      if (error instanceof Error && error.message.includes("not found")) {
+        res.status(404).json({ success: false, message: "Không tìm thấy dữ liệu" });
+      } else {
+        res.status(500).json({
+          success: false,
+          message: "Lỗi máy chủ nội bộ",
+        });
+      }
     }
   },
 
@@ -59,10 +68,15 @@ export const bookingController = {
       const result = await bookingService.cancelBooking(bookingId);
       res.json(result);
     } catch (error: any) {
-      res.status(400).json({
-        success: false,
-        message: error.message,
-      });
+      if (error instanceof Error) {
+        if (error.message.includes("not found")) {
+          res.status(404).json({ success: false, message: "Không tìm thấy dữ liệu" });
+        } else {
+          res.status(400).json({ success: false, message: error.message });
+        }
+      } else {
+        res.status(500).json({ success: false, message: "Lỗi máy chủ nội bộ" });
+      }
     }
   },
 };

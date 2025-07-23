@@ -10,7 +10,7 @@ export const signUp = async (req: Request, res: Response) => {
     if (err instanceof Error) {
       res.status(400).json({ error: err.message });
     } else {
-      res.status(500).json({ error: "Internal Server Error" });
+      res.status(500).json({ error: "Lỗi máy chủ nội bộ" });
     }
   }
 };
@@ -28,7 +28,7 @@ export const signIn = async (req: Request, res: Response) => {
     if (err instanceof Error) {
       res.status(400).json({ error: err.message });
     } else {
-      res.status(500).json({ error: "Internal Server Error" });
+      res.status(500).json({ error: "Lỗi máy chủ nội bộ" });
     }
   }
 };
@@ -46,7 +46,7 @@ export const refreshToken = async (req: Request, res: Response) => {
     if (err instanceof Error) {
       res.status(401).json({ error: err.message });
     } else {
-      res.status(500).json({ error: "Internal Server Error" });
+      res.status(500).json({ error: "Lỗi máy chủ nội bộ" });
     }
   }
 };
@@ -113,7 +113,7 @@ export const signOut = async (req: Request, res: Response) => {
     if (err instanceof Error) {
       res.status(400).json({ error: err.message });
     } else {
-      res.status(500).json({ error: "Internal Server Error" });
+      res.status(500).json({ error: "Lỗi máy chủ nội bộ" });
     }
   }
 };
@@ -123,7 +123,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
     const users = await userService.getAllUsers();
     res.status(200).json(users);
   } catch (err) {
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: "Lỗi máy chủ nội bộ" });
   }
 };
 
@@ -133,10 +133,14 @@ export const deleteUser = async (req: Request, res: Response) => {
     const user = await userService.deleteUser(userId);
     res.status(200).json(user);
   } catch (err) {
-    if (err instanceof Error && err.message === "User not found") {
-      res.status(404).json({ error: "User not found" });
+    if (err instanceof Error) {
+      if (err.message === "User not found") {
+        res.status(404).json({ error: "Không tìm thấy người dùng" });
+      } else {
+        res.status(400).json({ error: err.message });
+      }
     } else {
-      res.status(500).json({ error: "Internal Server Error" });
+      res.status(500).json({ error: "Lỗi máy chủ nội bộ" });
     }
   }
 };
@@ -147,10 +151,14 @@ export const getUserById = async (req: Request, res: Response) => {
     const user = await userService.getUserById(userId);
     res.status(200).json(user);
   } catch (err) {
-    if (err instanceof Error && err.message === "User not found") {
-      res.status(404).json({ error: "User not found" });
+    if (err instanceof Error) {
+      if (err.message === "User not found") {
+        res.status(404).json({ error: "Không tìm thấy người dùng" });
+      } else {
+        res.status(400).json({ error: err.message });
+      }
     } else {
-      res.status(500).json({ error: "Internal Server Error" });
+      res.status(500).json({ error: "Lỗi máy chủ nội bộ" });
     }
   }
 };
@@ -162,9 +170,13 @@ export const updateUser = async (req: Request, res: Response) => {
     res.status(200).json(updatedUser);
   } catch (err) {
     if (err instanceof Error) {
-      res.status(400).json({ error: err.message });
+      if (err.message === "User not found") {
+        res.status(404).json({ error: "Không tìm thấy người dùng" });
+      } else {
+        res.status(400).json({ error: err.message });
+      }
     } else {
-      res.status(500).json({ error: "Internal Server Error" });
+      res.status(500).json({ error: "Lỗi máy chủ nội bộ" });
     }
   }
 };
@@ -183,7 +195,7 @@ export const changePassword = async (req: Request, res: Response) => {
     if (err instanceof Error) {
       res.status(400).json({ error: err.message });
     } else {
-      res.status(500).json({ error: "Internal Server Error" });
+      res.status(500).json({ error: "Lỗi máy chủ nội bộ" });
     }
   }
 };
@@ -207,7 +219,7 @@ export const updateProfile = async (req: Request, res: Response) => {
     if (err instanceof Error) {
       res.status(400).json({ error: err.message });
     } else {
-      res.status(500).json({ error: "Internal Server Error" });
+      res.status(500).json({ error: "Lỗi máy chủ nội bộ" });
     }
   }
 };
@@ -218,10 +230,14 @@ export const getProfile = async (req: Request, res: Response) => {
     const user = await userService.getUserById(userId);
     res.status(200).json(user);
   } catch (err) {
-    if (err instanceof Error && err.message === "User not found") {
-      res.status(404).json({ error: "User not found" });
+    if (err instanceof Error) {
+      if (err.message === "User not found") {
+        res.status(404).json({ error: "Không tìm thấy người dùng" });
+      } else {
+        res.status(400).json({ error: err.message });
+      }
     } else {
-      res.status(500).json({ error: "Internal Server Error" });
+      res.status(500).json({ error: "Lỗi máy chủ nội bộ" });
     }
   }
 };
@@ -240,7 +256,7 @@ export const changeUserStatus = async (req: Request, res: Response) => {
     if (err instanceof Error) {
       res.status(400).json({ error: err.message });
     } else {
-      res.status(500).json({ error: "Internal Server Error" });
+      res.status(500).json({ error: "Lỗi máy chủ nội bộ" });
     }
   }
 };

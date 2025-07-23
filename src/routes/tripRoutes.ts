@@ -8,6 +8,7 @@ import {
   searchTrips,
   createMultipleTrips,
   getTripsbyRouteId,
+  updateTripStatus, // thêm controller mới
 } from "../controllers/tripController";
 
 const tripRoutes = express.Router();
@@ -335,5 +336,41 @@ tripRoutes.delete("/:id", deleteTrip);
  *         description: Không tìm thấy tuyến đường hoặc chuyến xe
  */
 tripRoutes.get("/route/:routeId", getTripsbyRouteId);
+
+/**
+ * @swagger
+ * /api/trips/{id}/status:
+ *   patch:
+ *     summary: Cập nhật trạng thái chuyến xe (scheduled → in_progress → completed, hoặc cancelled)
+ *     tags: [Trips]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID của chuyến xe
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [scheduled, in_progress, completed, cancelled]
+ *                 description: Trạng thái mới
+ *             required:
+ *               - status
+ *     responses:
+ *       200:
+ *         description: Cập nhật trạng thái thành công
+ *       400:
+ *         description: Chuyển trạng thái không hợp lệ hoặc thiếu dữ liệu
+ *       404:
+ *         description: Không tìm thấy chuyến xe
+ */
+tripRoutes.patch("/:id/status", updateTripStatus);
 
 export default tripRoutes;
