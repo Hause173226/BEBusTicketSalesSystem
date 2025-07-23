@@ -181,7 +181,9 @@ export const updateTripStatus = async (req: Request, res: Response) => {
     if (err instanceof Error && err.message === "Trip not found") {
       res.status(404).json({ error: "Không tìm thấy chuyến đi" });
     } else {
-      res.status(400).json({ error: err.message || "Chuyển trạng thái không hợp lệ" });
+      res
+        .status(400)
+        .json({ error: err.message || "Chuyển trạng thái không hợp lệ" });
     }
   }
 };
