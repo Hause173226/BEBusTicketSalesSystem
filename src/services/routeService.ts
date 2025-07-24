@@ -1,5 +1,6 @@
 import { Route } from "../models/Route";
 import { IRoute } from "../interfaces/IRoute";
+import { Station } from "../models/Station";
 
 export const routeService = {
   // Create a new route
@@ -10,8 +11,29 @@ export const routeService = {
       destinationStation: routeData.destinationStation,
     });
     if (existed) {
-      throw new Error("Route with the same origin and destination already exists");
+      throw new Error("Tuyến đường với điểm đi và điểm đến này đã tồn tại");
     }
+
+    // Kiểm tra trạng thái của originStation
+    const originStation = await Station.findById(routeData.originStation);
+    if (!originStation) {
+      throw new Error("Không tìm thấy bến đi");
+    }
+    if (originStation.status !== "active") {
+      throw new Error("Bến đi hiện không hoạt động");
+    }
+
+    // Kiểm tra trạng thái của destinationStation
+    const destinationStation = await Station.findById(
+      routeData.destinationStation
+    );
+    if (!destinationStation) {
+      throw new Error("Không tìm thấy bến đến");
+    }
+    if (destinationStation.status !== "active") {
+      throw new Error("Bến đến hiện không hoạt động");
+    }
+
     const route = await Route.create(routeData);
     return route;
   },
@@ -61,9 +83,13 @@ export const routeService = {
       throw new Error("Only routes with status 'inactive' can be deleted");
     }
     // Kiểm tra còn trip nào liên kết không
-    const tripCount = await require("../models/Trip").Trip.countDocuments({ route: routeId });
+    const tripCount = await require("../models/Trip").Trip.countDocuments({
+      route: routeId,
+    });
     if (tripCount > 0) {
-      throw new Error("Cannot delete route: there are trips linked to this route");
+      throw new Error(
+        "Cannot delete route: there are trips linked to this route"
+      );
     }
     await Route.findByIdAndDelete(routeId);
     return route;
