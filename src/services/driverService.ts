@@ -31,12 +31,12 @@ export const driverService = {
       throw new Error("Driver not found");
     }
     if (driver.status !== "inactive" && driver.status !== "suspended") {
-      throw new Error("Only drivers with status 'inactive' or 'suspended' can be deleted");
+      throw new Error("Chỉ được xóa tài xế có trạng thái 'ngừng hoạt động' hoặc 'đình chỉ'");
     }
     // Kiểm tra còn trip nào liên kết không
     const tripCount = await require("../models/Trip").Trip.countDocuments({ driver: driverId });
     if (tripCount > 0) {
-      throw new Error("Cannot delete driver: there are trips linked to this driver");
+      throw new Error("Không thể xóa tài xế: vẫn còn chuyến xe liên kết với tài xế này");
     }
     await Driver.findByIdAndDelete(driverId);
     return driver;

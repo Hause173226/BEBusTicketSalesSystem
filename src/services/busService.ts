@@ -55,12 +55,12 @@ export const busService = {
       throw new Error("Bus not found");
     }
     if (bus.status !== "inactive") {
-      throw new Error("Only buses with status 'inactive' can be deleted");
+      throw new Error("Chỉ được xóa xe có trạng thái 'ngừng hoạt động'");
     }
     // Kiểm tra còn trip nào liên kết không
     const tripCount = await require("../models/Trip").Trip.countDocuments({ bus: busId });
     if (tripCount > 0) {
-      throw new Error("Cannot delete bus: there are trips linked to this bus");
+      throw new Error("Không thể xóa xe: vẫn còn chuyến xe liên kết với xe này");
     }
     await Bus.findByIdAndDelete(busId);
     return bus;

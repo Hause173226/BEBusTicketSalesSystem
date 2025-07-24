@@ -345,6 +345,26 @@ export const tripService = {
         ].join(", ")}`
       );
     }
+    // Thêm kiểm tra thời gian thực tế
+    const now = new Date();
+    const [depHour, depMinute] = trip.departureTime.split(":").map(Number);
+    const depDate = new Date(trip.departureDate);
+    depDate.setHours(depHour, depMinute, 0, 0);
+    let arrDate: Date | null = null;
+    if (trip.arrivalTime) {
+      const [arrHour, arrMinute] = trip.arrivalTime.split(":").map(Number);
+      arrDate = new Date(trip.departureDate);
+      arrDate.setHours(arrHour, arrMinute, 0, 0);
+      if (arrHour < depHour || (arrHour === depHour && arrMinute < depMinute)) {
+        arrDate.setDate(arrDate.getDate() + 1);
+      }
+    }
+    if (newStatus === "in_progress" && now < depDate) {
+      throw new Error("Chưa đến giờ khởi hành, không thể chuyển sang trạng thái 'Đang chạy'.");
+    }
+    if (newStatus === "completed" && arrDate && now < arrDate) {
+      throw new Error("Chưa đến giờ đến, không thể chuyển sang trạng thái 'Hoàn thành'.");
+    }
     trip.status = newStatus as
       | "scheduled"
       | "in_progress"

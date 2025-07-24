@@ -57,7 +57,7 @@ export const stationService = {
       throw new Error("Station not found");
     }
     if (station.status !== "inactive") {
-      throw new Error("Only stations with status 'inactive' can be deleted");
+      throw new Error("Chỉ được xóa bến xe có trạng thái 'ngừng hoạt động'");
     }
     // Kiểm tra còn route nào liên kết không
     const routeCount = await require("../models/Route").Route.countDocuments({
@@ -67,7 +67,7 @@ export const stationService = {
       ]
     });
     if (routeCount > 0) {
-      throw new Error("Cannot delete station: there are routes linked to this station");
+      throw new Error("Không thể xóa bến xe: vẫn còn tuyến đường liên kết với bến này");
     }
     // Kiểm tra còn trip nào liên kết không (nếu có logic liên kết trực tiếp)
     // const tripCount = await require("../models/Trip").Trip.countDocuments({
