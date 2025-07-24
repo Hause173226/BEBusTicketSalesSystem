@@ -20,6 +20,7 @@ import paymentRouter from "./routes/paymentRoutes";
 import seatRoutes from "./routes/seatRoutes";
 import uploadRoutes from "./routes/uploadRoutes";
 import path from "path";
+import "./cron/tripStatusUpdater";
 
 
 const app = express();
